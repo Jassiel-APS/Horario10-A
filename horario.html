@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="manifest" href="./manifest.json">
+  <link rel="icon" href="./icons/icon-192x192.png" sizes="192x192" type="image/png">
+  <link rel="apple-touch-icon" href="./icons/icon-192x192.png">
+  <meta name="msapplication-TileImage" content="./icons/icon-144x144.png">
+  <meta name="theme-color" content="#0b0f17">
+  <meta name="mobile-web-app-capable" content="yes">
+  <title>Horario 10°A‑IDGS · Sep–Dic 2025</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{
+      --bg:#0b0f17;          /* fondo principal */
+      --panel:#101827;       /* paneles oscuros */
+      --panel-2:#0f1624;     /* bordes/sombras */
+      --text:#dce7ff;        /* texto primario */
+      --muted:#8ea3c7;       /* texto secundario */
+      --grid:#1a2740;        /* líneas de la grilla */
+      --glow: 0 0 0px rgba(0,0,0,0);
+      /* Colores por materia (neón oscuro estilo gamer) */
+  /* colores con mayor contraste y tonalidades diferenciadas */
+  --c-apps: linear-gradient(135deg,#00c38a,#007b5e);
+  --c-gestion: linear-gradient(135deg,#1f8cff,#005bb5);
+  --c-movil: linear-gradient(135deg,#5d63ff,#2a1cff);
+  --c-integradora: linear-gradient(135deg,#ff6fb1,#b84dff);
+  --c-optativa: linear-gradient(135deg,#9a00ff,#00d6f0);
+  --c-nego: linear-gradient(135deg,#ff5e6c,#ff8a3d);
+  --c-ingles: linear-gradient(135deg,#23d6b4,#017f73);
+    }
+    html,body{height:100%}
+    body{
+      margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; color:var(--text);
+      /* fondo principal — fijo para evitar recortes al cambiar contenido */
+      background: radial-gradient(1200px 800px at 20% -10%, #10213b55, transparent),
+                  radial-gradient(1000px 600px at 120% 10%, #401a7550, transparent),
+                  var(--bg);
+      min-height:100vh;
+      background-attachment:fixed;
+      background-size:cover;
+    }
+  /* contenedor: no forzar altura, dejar que el contenido fluya; padding inferior reducido */
+  .wrap{max-width:1060px; margin:0 auto; padding:24px 16px 32px; min-height:auto}
+    header h1{margin:0; font-size:clamp(20px,2.6vw,28px); letter-spacing:-.2px}
+    header p{margin:.25rem 0 0; color:var(--muted); font-size:14px}
+    .toolbar{margin-top:18px; display:flex; gap:10px; flex-wrap:wrap}
+    button, select{
+      background:var(--panel); color:var(--text); border:1px solid #223150; border-radius:12px;
+      padding:10px 14px; font-weight:600; letter-spacing:.2px; cursor:pointer;
+    }
+    button:hover{filter:brightness(1.05)}
+    .ghost{background:transparent}
+  .icon-btn{width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:8px}
+  .icon-btn svg{color:var(--muted); width:20px;height:20px}
+
+  /* Vista móvil: lista por día */
+  .day-view{display:grid; gap:12px; margin-top:20px}
+    .day-picker{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+    .subtitle{color:var(--muted); font-size:13px}
+
+  .card{border-radius:16px; padding:20px 20px; background:var(--panel); border:1px solid #1a2a47; position:relative; overflow:hidden}
+  /* más espacio entre cards en móvil */
+  @media (max-width:899px){ .day-view .card{margin-bottom:12px} }
+    .card:before{content:""; position:absolute; inset:-1px; border-radius:16px; padding:1px; background:linear-gradient(120deg,transparent,rgba(255,255,255,.06),transparent); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+      -webkit-mask-composite: xor; mask-composite:exclude; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);}
+  .card .title{font-weight:700; font-size:19px; line-height:1.05}
+  .card .meta{font-size:14px; color:var(--muted)}
+    .chip{display:inline-block; font-size:11px; padding:.22rem .5rem; border-radius:999px; background:#0c1430; border:1px solid #1c2b52; color:#b9cffb}
+
+    /* Badge de color */
+    .badge{position:absolute; inset:auto 14px 14px auto; font-size:12px; padding:.36rem .6rem; border-radius:10px; font-weight:700; color:#051016;
+      box-shadow:0 8px 24px rgba(0,0,0,.45)}
+    .apps{background:var(--c-apps)}
+    .gestion{background:var(--c-gestion)}
+    .movil{background:var(--c-movil)}
+    .integ{background:var(--c-integradora)}
+    .optativa{background:var(--c-optativa)}
+    .nego{background:var(--c-nego)}
+    .ingles{background:var(--c-ingles)}
+
+    /* Resaltado de clase actual */
+    .now{outline:1px solid rgba(255,255,255,.15); box-shadow:0 0 0 2px #92a7ff2e, 0 0 24px #7d5bff55}
+    .now .title{filter:drop-shadow(0 2px 10px #7a59ff88)}
+  /* siguiente clase destacada (leve) */
+  .next{box-shadow:0 8px 18px rgba(0,0,0,.45); transform:translateY(-2px); border:1px solid rgba(255,255,255,.04)}
+  /* estados de alumbrado: dim (lejano), near (casi), now (actual) */
+  .dim{opacity:0.65; filter:grayscale(.15) brightness(.9); transform:none}
+  .near{opacity:0.9; transform:translateY(-4px) scale(1.02); box-shadow:0 12px 30px rgba(0,0,0,.5)}
+  .now{opacity:1; transform:translateY(-6px) scale(1.035); box-shadow:0 18px 48px rgba(122,89,255,.25); border:1px solid rgba(255,255,255,.06)}
+
+  /* Animaciones para indicar actividad */
+  @keyframes pulseGlow{ 0%{ box-shadow:0 6px 18px rgba(122,89,255,0.12)} 50%{ box-shadow:0 22px 56px rgba(122,89,255,0.28)} 100%{ box-shadow:0 6px 18px rgba(122,89,255,0.12)} }
+  @keyframes shimmer{ 0%{ background-position: -200% 0 } 100%{ background-position: 200% 0 } }
+
+  .now.animated{ animation: pulseGlow 2s ease-in-out infinite; }
+  .near.animated{ background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
+  .next{ transform:translateY(-4px); }
+
+  /* Respect user preference for reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    .now.animated, .near.animated{ animation: none; }
+  }
+
+  /* Mobile-friendly overlay animations using pseudo-element (better performance) */
+  .now.animated::after, .near.animated::after{
+    content: '';
+    position: absolute; inset:0; border-radius:16px; pointer-events:none; opacity:0; transition:opacity .35s ease;
+  }
+  .now.animated::after{ background: radial-gradient(600px 200px at 20% 0%, rgba(125,91,255,0.18), transparent 40%); animation: pulseGlow 2.4s ease-in-out infinite; }
+  .near.animated::after{ background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.05), rgba(255,255,255,0.02)); background-size:200% 100%; animation: shimmer 3s linear infinite; }
+  .now.animated::after, .near.animated::after{ opacity:1 }
+
+    /* Vista escritorio: grid semanal */
+    .week{display:none}
+    @media (min-width:900px){
+      .day-view{display:none}
+      .week{display:grid; margin-top:18px; border:1px solid #15233f; border-radius:14px; overflow:hidden; background:linear-gradient(#0c1220,#0c1220) padding-box, linear-gradient(120deg,#223459,#0f1a30) border-box}
+      .week .header{display:grid; grid-template-columns:120px repeat(5,1fr); background:#0f1628; border-bottom:1px solid #182744}
+      .week .header div{padding:12px 14px; font-weight:700; color:#c8d7ff; font-size:14px}
+      .week .row{display:grid; grid-template-columns:120px repeat(5,1fr)}
+      .hour{padding:12px 10px; color:#9bb2da; font-size:12px; text-align:right; border-right:1px solid #182744; background:#0b1324}
+      .cell{min-height:76px; border-left:1px solid #182744; border-bottom:1px dashed #1b2b4d; padding:8px}
+    .mini{padding:10px; border-radius:10px; color:#fff; font-weight:700; font-size:12px; box-shadow:inset 0 0 0 1px rgba(255,255,255,.04), 0 10px 26px rgba(0,0,0,.45)}
+      .mini{position:relative}
+      .mini .when{display:block; margin-top:4px; font-weight:600; font-size:11px; color:#091528}
+      .mini .room{display:block; margin-top:2px; font-weight:600; font-size:10px; opacity:.85}
+    }
+
+    /* Leyenda */
+  .legend{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:10px; margin-top:18px}
+  /* ocultar leyenda por defecto en móvil */
+  @media (max-width:899px){ .legend{display:none} .legend.open{display:grid} }
+    .legend .item{display:flex; gap:10px; align-items:center}
+    .swatch{width:16px; height:16px; border-radius:6px}
+    .swatch{display:inline-block; background-size:cover; background-position:center; width:18px; height:18px; box-shadow:0 6px 18px rgba(0,0,0,0.25)}
+    .day-picker{z-index:40}
+    .toolbar{position:relative; z-index:20}
+
+    /* mini-specific overlay radius */
+    .mini.now.animated::after, .mini.near.animated::after{ border-radius:10px }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header id="appHeader">
+      <!-- En móvil mostraremos día, fecha y hora en tiempo real -->
+      <div id="mobileHeader" style="display:flex;flex-direction:column;gap:6px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <div>
+            <div id="currentDay" style="font-weight:700;font-size:18px"></div>
+            <div id="currentDate" style="color:var(--muted);font-size:13px"></div>
+          </div>
+          <div style="text-align:right">
+            <div id="currentTime" style="font-weight:700;font-size:18px"></div>
+            <div style="font-size:12px;color:var(--muted)">Hora local</div>
+          </div>
+        </div>
+        <div class="toolbar" style="align-items:center;gap:8px">
+          <!-- Icon button: seleccionar día -->
+          <button id="btnToggleDay" title="Seleccionar día" aria-label="Seleccionar día" class="icon-btn"> 
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <!-- Icon button: mostrar/ocultar leyenda -->
+          <button id="btnToggleLegend" title="Mostrar leyenda" aria-label="Mostrar legend" class="icon-btn">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+          </button>
+          <!-- Icon button: alternar formato 12/24 -->
+          <button id="btnToggleFormat" title="Cambiar formato 12/24" aria-label="Cambiar formato" class="icon-btn">12/24</button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Vista por día (móvil) -->
+    <section class="day-view" id="dayView">
+      <div class="day-picker" id="dayPicker" style="display:none;">
+        <span class="subtitle">Día:</span>
+        <select id="daySelect" aria-label="Selecciona día"></select>
+      </div>
+      <div id="dayCards"></div>
+    </section>
+
+    <!-- Vista semanal (escritorio) -->
+    <section class="week" id="weekGrid" aria-label="Semana completa">
+      <div class="header">
+        <div>Hora</div>
+        <div>Lunes</div>
+        <div>Martes</div>
+        <div>Miércoles</div>
+        <div>Jueves</div>
+        <div>Viernes</div>
+      </div>
+      <div id="weekBody"></div>
+    </section>
+
+    <!-- Leyenda (oculta en móvil, desplegable) -->
+    <section class="legend" aria-label="Colores de materias" id="legend">
+      <!-- leyenda generada dinámicamente -->
+    </section>
+  </div>
+
+  <script>
+    /* ===================
+       Datos del horario
+    ==================== */
+    const DAYS = ["Lunes","Martes","Miércoles","Jueves","Viernes"]; // sábado vacío
+    const EVENTS = [
+      // Lunes
+      { d:"Lunes", h:"16:00", e:"17:00", t:"Aplicaciones web progresivas", a:"CC10/CECADEC", p:"José Christian Narváez Figueroa", k:"apps" },
+      { d:"Lunes", h:"17:00", e:"18:00", t:"Aplicaciones web progresivas", a:"CC10/CECADEC", p:"José Christian Narváez Figueroa", k:"apps" },
+      { d:"Lunes", h:"18:00", e:"19:00", t:"Gestión Proc. Des. Soft", a:"CC1/CEDIM", p:"Ángel Yazveck Alcocer Durán", k:"gestion" },
+      { d:"Lunes", h:"19:00", e:"20:00", t:"Optativa I: Creación de videojuegos", a:"CC11/D4", p:"David Navas Landa", k:"optativa" },
+      { d:"Lunes", h:"20:00", e:"21:00", t:"Desarrollo móvil integral", a:"CC2/CEDIM", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      // Martes
+      { d:"Martes", h:"15:00", e:"16:00", t:"Inglés IX", a:"A1/D1", p:"Sughey Adriana Moreno Arellano", k:"ingles" },
+      { d:"Martes", h:"16:00", e:"17:00", t:"Aplicaciones web progresivas", a:"CC10/CECADEC", p:"José Christian Narváez Figueroa", k:"apps" },
+      { d:"Martes", h:"17:00", e:"18:00", t:"Optativa I: Creación de videojuegos", a:"CC11/D4", p:"David Navas Landa", k:"optativa" },
+      { d:"Martes", h:"18:00", e:"19:00", t:"Optativa I: Creación de videojuegos", a:"CC11/D4", p:"David Navas Landa", k:"optativa" },
+      { d:"Martes", h:"19:00", e:"20:00", t:"Desarrollo móvil integral", a:"CA3/D4", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      { d:"Martes", h:"20:00", e:"21:00", t:"Desarrollo móvil integral", a:"CA3/D4", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      // Miércoles
+      { d:"Miércoles", h:"16:00", e:"17:00", t:"Gestión Proc. Des. Soft", a:"CC11/D4", p:"Ángel Yazveck Alcocer Durán", k:"gestion" },
+      { d:"Miércoles", h:"17:00", e:"18:00", t:"Inglés IX", a:"A5/D1", p:"Sughey Adriana Moreno Arellano", k:"ingles" },
+      { d:"Miércoles", h:"18:00", e:"19:00", t:"Inglés IX", a:"A5/D1", p:"Sughey Adriana Moreno Arellano", k:"ingles" },
+      { d:"Miércoles", h:"19:00", e:"20:00", t:"Negociación empresarial", a:"A4/D1", p:"Alfredo Hugo Silva García", k:"nego" },
+      { d:"Miércoles", h:"20:00", e:"21:00", t:"Optativa I: Creación de videojuegos", a:"CC11/D4", p:"David Navas Landa", k:"optativa" },
+      // Jueves
+      { d:"Jueves", h:"17:00", e:"18:00", t:"Integradora", a:"A6/D1", p:"Alfonso Bahena Ramírez", k:"integ" },
+      { d:"Jueves", h:"18:00", e:"19:00", t:"Integradora", a:"A6/D1", p:"Alfonso Bahena Ramírez", k:"integ" },
+      { d:"Jueves", h:"19:00", e:"20:00", t:"Desarrollo móvil integral", a:"CC2/CEDIM", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      { d:"Jueves", h:"20:00", e:"21:00", t:"Desarrollo móvil integral", a:"CC2/CEDIM", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      // Viernes
+      { d:"Viernes", h:"15:00", e:"16:00", t:"Inglés IX", a:"A9/D1", p:"Sughey Adriana Moreno Arellano", k:"ingles" },
+      { d:"Viernes", h:"16:00", e:"17:00", t:"Desarrollo móvil integral", a:"CC1/CEDIM", p:"Maximiliano Carsi Castrejón", k:"movil" },
+      { d:"Viernes", h:"17:00", e:"18:00", t:"Negociación empresarial", a:"Sala 4 Doc 4", p:"Alfredo Hugo Silva García", k:"nego" },
+      { d:"Viernes", h:"18:00", e:"19:00", t:"Gestión Proc. Des. Soft", a:"CC10/CECADEC", p:"Ángel Yazveck Alcocer Durán", k:"gestion" },
+      { d:"Viernes", h:"19:00", e:"20:00", t:"Gestión Proc. Des. Soft", a:"CC10/CECADEC", p:"Ángel Yazveck Alcocer Durán", k:"gestion" },
+    ];
+
+  /* Utilidades */
+  const toMin = (s)=>{const [h,m]=s.split(":").map(Number); return h*60+m};
+  const fmt = (n)=> String(n).padStart(2,"0");
+  // Formato hora: 12 o 24 (persistente)
+  function getHourFormat(){ return localStorage.getItem('hourFormat') || '12'; }
+  function toggleHourFormat(){ const f = getHourFormat() === '12' ? '24' : '12'; localStorage.setItem('hourFormat', f); return f; }
+  function formatTime(t){ const [H,M]=t.split(':').map(Number); if(getHourFormat()==='24') return `${String(H).padStart(2,'0')}:${String(M).padStart(2,'0')}`; const am = H<12; const h = ((H+11)%12)+1; return `${h}:${String(M).padStart(2,'0')} ${am? 'AM':'PM'}`; }
+
+    /* ====== Day View (móvil) ====== */
+    const daySel = document.getElementById('daySelect');
+    const dayCards = document.getElementById('dayCards');
+    DAYS.forEach(d=>{const o=document.createElement('option'); o.value=d; o.textContent=d; daySel.appendChild(o)});
+
+    function renderDay(day, highlightNow=true){
+      daySel.value = day;
+      dayCards.innerHTML = '';
+      const list = EVENTS.filter(e=>e.d===day).sort((a,b)=> toMin(a.h)-toMin(b.h));
+      const now = new Date();
+      const nowMin = now.getHours()*60 + now.getMinutes();
+      let scrolled=false;
+      // Marcadores calculados: obtener índices de eventos que están ahora, near, next
+      const marks = computeNowHighlight(list, nowMin, highlightNow);
+      // decidir índice 'nearest' a animar cuando NO hay now
+      let nearestIndex = -1;
+      if(marks.nowIndexes.size===0){
+        // preferir near si existe, sino next
+        if(marks.nearIndexes.size>0){ nearestIndex = Math.min(...Array.from(marks.nearIndexes)); }
+        else if(marks.nextIndexes.size>0){ nearestIndex = Math.min(...Array.from(marks.nextIndexes)); }
+      }
+      list.forEach((ev, idx)=>{
+        const card = document.createElement('div');
+        card.className = 'card';
+        // aplicar clases según marks: dim por defecto
+        card.classList.add('dim');
+        if(marks.nowIndexes.has(idx)){
+          // evento actual: siempre animar
+          card.classList.remove('dim'); card.classList.add('now'); card.classList.add('animated');
+        } else if(nearestIndex===idx){
+          // no hay now: animar solo la clase más cercana
+          // marcar como near si estaba dentro del umbral, si no usar 'next'
+          if(marks.nearIndexes.has(idx)){
+            card.classList.remove('dim'); card.classList.add('near'); card.classList.add('animated');
+          } else {
+            card.classList.remove('dim'); card.classList.add('next'); card.classList.add('animated');
+          }
+        } else if(marks.nearIndexes.has(idx)){
+          // otros cercanos sin animación
+          card.classList.remove('dim'); card.classList.add('near');
+        } else if(marks.nextIndexes.has(idx)){
+          card.classList.remove('dim'); card.classList.add('next');
+        }
+  const when = formatTime(ev.h) + ' – ' + formatTime(ev.e);
+        card.innerHTML = `
+          <div class="title">${ev.t}</div>
+          <div class="meta">${when} · <span class="chip">${ev.a}</span></div>
+          <div class="meta" style="margin-top:6px">${ev.p}</div>
+          <span class="badge ${ev.k}">${ev.d}</span>
+        `;
+        // scroll al primer ahora
+        if(marks.firstNowIndex===idx && !scrolled){
+          setTimeout(()=> card.scrollIntoView({behavior:'smooth', block:'center'}), 50);
+          scrolled=true;
+        }
+        dayCards.appendChild(card);
+      });
+      if(list.length===0){
+        const empty=document.createElement('div');
+        empty.className='card';
+        empty.innerHTML='<div class="title">Sin clases</div><div class="meta">Disfruta tu día ✨</div>';
+        dayCards.appendChild(empty);
+      }
+    }
+
+    daySel.addEventListener('change', e=> renderDay(e.target.value, false));
+
+    /* ====== Week Grid (escritorio) ====== */
+    const weekBody = document.getElementById('weekBody');
+  const HOURS = ["15:00","16:00","17:00","18:00","19:00","20:00"]; // filas
+
+    function renderWeek(){
+      weekBody.innerHTML='';
+      const now = new Date();
+      const nowMin = now.getHours()*60 + now.getMinutes();
+      HOURS.forEach(hr=>{
+        const row = document.createElement('div'); row.className = 'row';
+        const hourCell = document.createElement('div'); hourCell.className = 'hour'; hourCell.textContent = to12(hr); row.appendChild(hourCell);
+        DAYS.forEach(day=>{
+          const cell = document.createElement('div'); cell.className = 'cell';
+          const items = EVENTS.filter(e=>e.d===day && e.h===hr);
+          // compute marks for this day's items to decide nearest
+          const dayList = EVENTS.filter(e=>e.d===day).sort((a,b)=> toMin(a.h)-toMin(b.h));
+          const dayMarks = computeNowHighlight(dayList, nowMin, true);
+          let nearestIdxForDay = -1;
+          if(dayMarks.nowIndexes.size===0){
+            if(dayMarks.nearIndexes.size>0) nearestIdxForDay = Math.min(...Array.from(dayMarks.nearIndexes));
+            else if(dayMarks.nextIndexes.size>0) nearestIdxForDay = Math.min(...Array.from(dayMarks.nextIndexes));
+          }
+          items.forEach(ev=>{
+            const mini = document.createElement('div'); mini.className = `mini ${ev.k} dim`;
+            // set background from CSS variable, with mapping fallback
+            const cssVarMap = { integ: 'integradora' };
+            const varName = cssVarMap[ev.k] || ev.k;
+            let bgVal = getComputedStyle(document.documentElement).getPropertyValue(`--c-${varName}`) || '';
+            if(!bgVal || !bgVal.trim()){
+              const tmp = document.createElement('div'); tmp.style.display='none'; tmp.className = ev.k; document.body.appendChild(tmp);
+              bgVal = getComputedStyle(tmp).background || '';
+              document.body.removeChild(tmp);
+            }
+            if(bgVal && bgVal.trim()) mini.style.background = bgVal.trim();
+          const when = formatTime(ev.h) + ' – ' + formatTime(ev.e);
+            // detectar estado ahora / cerca para la mini-card
+            const start = toMin(ev.h), end = toMin(ev.e);
+            if(nowMin >= start && nowMin < end){
+              mini.classList.remove('dim'); mini.classList.add('now','animated');
+            } else {
+              // find index of this ev within dayList to compare with nearestIdxForDay
+              const idxInDay = dayList.findIndex(x=> x.h===ev.h && x.t===ev.t && x.a===ev.a);
+              if(nearestIdxForDay===idxInDay){
+                // animate only the nearest upcoming if no now
+                if(dayMarks.nearIndexes.has(idxInDay)) mini.classList.remove('dim'), mini.classList.add('near','animated');
+                else mini.classList.remove('dim'), mini.classList.add('next','animated');
+              } else if(nowMin < start && (start - nowMin) <= 20){
+                mini.classList.remove('dim'); mini.classList.add('near');
+              } else if(nowMin < start){
+                mini.classList.remove('dim'); mini.classList.add('next');
+              }
+            }
+            mini.innerHTML = `<div>${ev.t}</div><span class="when">${when}</span><span class="room">${ev.a}</span>`;
+            cell.appendChild(mini);
+          });
+          row.appendChild(cell);
+        });
+        weekBody.appendChild(row);
+      });
+    }
+
+    /* ====== Detección de día/hora actual ====== */
+    function todayIndex(){
+      const i = new Date().getDay(); // 0=Dom,1=Lun…
+      return Math.min(Math.max(i-1,0),4); // 0..4
+    }
+    function dayIndexFromName(n){ return DAYS.indexOf(n); }
+
+    function detectNow(){
+      const d = DAYS[todayIndex()] || 'Lunes';
+      renderDay(d, true);
+    }
+
+    // Toggle selector de día (móvil)
+    document.getElementById('btnToggleDay').addEventListener('click', ()=>{
+      const dp = document.getElementById('dayPicker'); if(!dp) return; dp.style.display = dp.style.display==='none'? 'flex':'none';
+    });
+
+    // Inicializar UI
+  renderWeek();
+  detectNow();
+  // iniciar reloj y resaltado periódicos (cada 15s)
+  updateClock();
+  setInterval(()=>{ updateClock(); const d = DAYS[todayIndex()]; renderDay(d, true); }, 15000);
+    // Generar leyenda dinámica: materia -> profesores
+    function buildLegend(){
+      const map = new Map();
+      EVENTS.forEach(ev=>{
+        const key = ev.t;
+        if(!map.has(key)) map.set(key, {prof: new Set(), k: ev.k});
+        map.get(key).prof.add(ev.p);
+      });
+      const legend = document.getElementById('legend');
+      legend.innerHTML = '';
+      // mapping short keys to actual CSS variable suffix when they differ
+      const cssVarMapLegend = { integ: 'integradora' };
+      map.forEach((v, subject)=>{
+        const item = document.createElement('div'); item.className='item';
+        const sw = document.createElement('span'); sw.className='swatch';
+        // try CSS variable first
+        const varName = cssVarMapLegend[v.k] || v.k;
+        let bg = getComputedStyle(document.documentElement).getPropertyValue(`--c-${varName}`);
+        if(!bg || !bg.trim()){
+          // fallback: try reading computed background from an element with the same class
+          const tmp = document.createElement('div'); tmp.style.display='none'; tmp.className = v.k; document.body.appendChild(tmp);
+          bg = getComputedStyle(tmp).background || '';
+          document.body.removeChild(tmp);
+        }
+        sw.style.background = (bg && bg.trim()) ? bg.trim() : '#666';
+        const txt = document.createElement('div'); txt.innerHTML = `<strong>${subject}</strong><div style="font-size:12px;color:var(--muted)">${Array.from(v.prof).join(', ')}</div>`;
+        item.appendChild(sw); item.appendChild(txt); legend.appendChild(item);
+      });
+    }
+    buildLegend();
+
+    // Legend toggle
+    document.getElementById('btnToggleLegend').addEventListener('click', ()=>{
+      const lg = document.getElementById('legend'); if(!lg) return; lg.classList.toggle('open');
+    });
+
+    // Format toggle
+    const fmtBtn = document.getElementById('btnToggleFormat');
+    if(fmtBtn){ fmtBtn.addEventListener('click', ()=>{ const f = toggleHourFormat(); fmtBtn.textContent = f==='12' ? '12/24' : '24/12'; renderWeek(); const d = DAYS[todayIndex()]; renderDay(d, true); }); }
+
+    // util: convertir 24h "HH:MM" a 12h "h:MM AM/PM"
+    function to12(t){
+      const [H,M]=t.split(':').map(Number);
+      const am = H<12; const h = ((H+11)%12)+1; return `${h}:${String(M).padStart(2,'0')} ${am? 'AM':'PM'}`;
+    }
+
+    // Actualiza el header con día, fecha y hora locales
+    function updateClock(){
+      const now = new Date();
+      const dayName = DAYS[todayIndex()] || 'Lunes';
+      const dateStr = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'short', day:'numeric'});
+      const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
+      const dayEl = document.getElementById('currentDay');
+      const dateEl = document.getElementById('currentDate');
+      const timeEl = document.getElementById('currentTime');
+      if(dayEl) dayEl.textContent = dayName;
+      if(dateEl) dateEl.textContent = dateStr.charAt(0).toUpperCase() + dateStr.slice(1);
+      if(timeEl) timeEl.textContent = timeStr;
+    }
+
+    
+
+    // Determina índices de eventos actuales y siguientes en la lista (por orden)
+    // Clasifica en: nowIndexes (actual), nearIndexes (poco antes), nextIndexes (la siguiente después de now), dim por defecto
+    function computeNowHighlight(list, nowMin, highlightNow){
+      const nowIndexes = new Set();
+      const nearIndexes = new Set();
+      const nextIndexes = new Set();
+      let firstNowIndex = -1;
+      if(!highlightNow) return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
+  // Umbrales (minutos)
+  const nearThreshold = 20; // minutos antes
+
+      for(let i=0;i<list.length;i++){
+        const ev = list[i];
+        let start = toMin(ev.h), end = toMin(ev.e);
+        // Si ahora está dentro del evento
+        if(nowMin>=start && nowMin<end){
+          // marcar sólo el evento actual (no unir consecutivos)
+          firstNowIndex = i;
+          nowIndexes.add(i);
+          // la siguiente inmediata
+          if(i+1 < list.length) nextIndexes.add(i+1);
+          break; // ya encontramos el evento actual
+        }
+        // Si ahora está antes del evento pero dentro del umbral 'near'
+        if(nowMin < start && (start - nowMin) <= nearThreshold){
+          nearIndexes.add(i);
+          // no rompemos: puede haber otro más cercano
+        }
+        // Si ahora está antes y no dentro de near y no hay now, marcar el primer futuro como next
+        if(nowMin < start && nextIndexes.size===0 && nowIndexes.size===0){
+          nextIndexes.add(i); break;
+        }
+      }
+      return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
+    }
+  </script>
+  <script src="./register.js"></script>
+</body>
+</html>
