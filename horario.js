@@ -70,4 +70,83 @@ document.addEventListener('DOMContentLoaded', ()=>{
     document.body.classList.toggle('dark');
     localStorage.setItem('hu_theme', document.body.classList.contains('dark') ? 'dark' : 'light');
   });
+
+  // Animación de hora actual: añade clase `now` a la celda correspondiente.
+  // Modo de prueba: fuerza una fila/columna como "actual". Úsalo solo temporalmente.
+  // Para la prueba que pediste: Jueves a las 17:00 -> dayIndex = 3 (0=Lunes), slotIndex = 2 (17:00-18:00)
+  const TEST_OVERRIDE = { enabled: false, dayIndex: 3, slotIndex: 2 };
+
+  function clearNowClasses(){
+    document.querySelectorAll('#schedule td.now').forEach(n=> n.classList.remove('now'));
+  }
+
+  function getCurrentSlotIndex(){
+    // Determinar la franja horaria actual según HORARIO.times
+    const now = new Date();
+    const minutes = now.getHours()*60 + now.getMinutes();
+    for(let i=0;i<HORARIO.times.length;i++){
+      const range = HORARIO.times[i].split('-').map(s=>s.trim());
+      const startParts = range[0].split(':').map(Number);
+      const endParts = range[1].split(':').map(Number);
+      const startMin = startParts[0]*60 + startParts[1];
+      const endMin = endParts[0]*60 + endParts[1];
+      if(minutes >= startMin && minutes < endMin) return i;
+    }
+    return -1;
+  }
+
+  function applyNowAnimation(){
+    clearNowClasses();
+    const table = document.querySelector('#schedule table');
+    if(!table) return;
+    const rows = table.querySelectorAll('tbody tr');
+    // Si TEST_OVERRIDE está activo, usar slot y day específicos
+    if(TEST_OVERRIDE && TEST_OVERRIDE.enabled){
+      const s = TEST_OVERRIDE.slotIndex;
+      const dayCol = TEST_OVERRIDE.dayIndex + 1; // porque col 0 es la hora
+      if(rows[s]){
+        const row = rows[s];
+        const target = row.querySelectorAll('td')[dayCol];
+        if(target && target.textContent.trim()){
+          target.classList.add('now');
+          // comprobar siguiente franja en la misma columna
+          if(rows[s+1]){
+            const nextCell = rows[s+1].querySelectorAll('td')[dayCol];
+            if(nextCell && nextCell.textContent.trim() && nextCell.textContent.trim() === target.textContent.trim()){
+              nextCell.classList.add('now');
+            }
+          }
+        }
+      }
+      return;
+    }
+
+    const idx = getCurrentSlotIndex();
+    if(idx === -1) return;
+    if(!rows[idx]) return;
+    const currentRow = rows[idx];
+    const cells = currentRow.querySelectorAll('td'); // primer td es la hora
+    // cells[1] corresponde al Lunes, etc.
+    for(let col=1; col<cells.length; col++){
+      const cell = cells[col];
+      const currentText = cell.textContent.trim();
+      if(!currentText) continue;
+      // marca actual
+      cell.classList.add('now');
+      // comprobar siguiente franja para la misma columna
+      if(rows[idx+1]){
+        const nextCell = rows[idx+1].querySelectorAll('td')[col];
+        if(nextCell){
+          const nextText = nextCell.textContent.trim();
+          if(nextText && nextText === currentText){
+            nextCell.classList.add('now');
+          }
+        }
+      }
+    }
+  }
+
+  // Inicializar y refrescar cada 30s
+  applyNowAnimation();
+  setInterval(applyNowAnimation, 30*1000);
 });

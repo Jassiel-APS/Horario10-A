@@ -98,6 +98,8 @@
 
   .now.animated{ animation: pulseGlow 2s ease-in-out infinite; }
   .near.animated{ background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
+  /* next (siguiente) - brillo leve y animado */
+  .next.animated{ background: linear-gradient(90deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.035) 50%, rgba(255,255,255,0.015) 100%); background-size:200% 100%; animation: shimmer 4s linear infinite; box-shadow:0 10px 30px rgba(125,89,255,0.08); }
   .next{ transform:translateY(-4px); }
 
   /* Respect user preference for reduced motion */
@@ -112,6 +114,7 @@
   }
   .now.animated::after{ background: radial-gradient(600px 200px at 20% 0%, rgba(125,91,255,0.18), transparent 40%); animation: pulseGlow 2.4s ease-in-out infinite; }
   .near.animated::after{ background: linear-gradient(90deg, rgba(255,255,255,0.02), rgba(255,255,255,0.05), rgba(255,255,255,0.02)); background-size:200% 100%; animation: shimmer 3s linear infinite; }
+  .next.animated::after{ background: radial-gradient(600px 200px at 20% 0%, rgba(125,91,255,0.08), transparent 40%); animation: none; }
   .now.animated::after, .near.animated::after{ opacity:1 }
 
     /* Vista escritorio: grid semanal */
@@ -253,16 +256,37 @@
     const dayCards = document.getElementById('dayCards');
     DAYS.forEach(d=>{const o=document.createElement('option'); o.value=d; o.textContent=d; daySel.appendChild(o)});
 
+  // Modo de prueba: forzar Jueves 17:00 (slotIndex 2)
+  // Úsalo sólo mientras pruebas; deja el reloj con hora real.
+  const TEST_OVERRIDE = { enabled: false, dayIndex: 3, slotIndex: 2 };
+
+    function getTestNowMin(){
+      if(TEST_OVERRIDE && TEST_OVERRIDE.enabled){
+        // usar la hora de la franja en HOURS (definida más abajo). Si HOURS aún no existe, calcular desde HORARIO.times
+        const slot = (typeof HOURS !== 'undefined' && HOURS[TEST_OVERRIDE.slotIndex]) ? HOURS[TEST_OVERRIDE.slotIndex] : (HORARIO && HORARIO.times && HORARIO.times[TEST_OVERRIDE.slotIndex] ? HORARIO.times[TEST_OVERRIDE.slotIndex].split('-')[0].trim() : null);
+        if(slot) return toMin(slot) + 1; // +1 para caer dentro del rango
+      }
+      const now = new Date(); return now.getHours()*60 + now.getMinutes();
+    }
+
     function renderDay(day, highlightNow=true){
       daySel.value = day;
       dayCards.innerHTML = '';
       const list = EVENTS.filter(e=>e.d===day).sort((a,b)=> toMin(a.h)-toMin(b.h));
-      const now = new Date();
-      const nowMin = now.getHours()*60 + now.getMinutes();
+  const nowMin = getTestNowMin();
       let scrolled=false;
       // Marcadores calculados: obtener índices de eventos que están ahora, near, next
       const marks = computeNowHighlight(list, nowMin, highlightNow);
-      // decidir índice 'nearest' a animar cuando NO hay now
+      // Si el evento actual y el siguiente son la misma materia, queremos que la siguiente alumbre leve.
+      const extraNext = new Set();
+      for(const i of Array.from(marks.nowIndexes)){
+        if(i+1 < list.length){
+          const cur = list[i].t && list[i].t.trim();
+          const nxt = list[i+1].t && list[i+1].t.trim();
+          if(cur && nxt && cur === nxt) extraNext.add(i+1);
+        }
+      }
+  // decidir índice 'nearest' a animar cuando NO hay now
       let nearestIndex = -1;
       if(marks.nowIndexes.size===0){
         // preferir near si existe, sino next
@@ -275,8 +299,11 @@
         // aplicar clases según marks: dim por defecto
         card.classList.add('dim');
         if(marks.nowIndexes.has(idx)){
-          // evento actual: siempre animar
+          // evento actual: siempre animar fuerte
           card.classList.remove('dim'); card.classList.add('now'); card.classList.add('animated');
+        } else if(extraNext.has(idx)){
+          // siguiente con misma materia: resaltar leve
+          card.classList.remove('dim'); card.classList.add('next'); card.classList.add('animated');
         } else if(nearestIndex===idx){
           // no hay now: animar solo la clase más cercana
           // marcar como near si estaba dentro del umbral, si no usar 'next'
@@ -321,8 +348,7 @@
 
     function renderWeek(){
       weekBody.innerHTML='';
-      const now = new Date();
-      const nowMin = now.getHours()*60 + now.getMinutes();
+      const nowMin = getTestNowMin();
       HOURS.forEach(hr=>{
         const row = document.createElement('div'); row.className = 'row';
         const hourCell = document.createElement('div'); hourCell.className = 'hour'; hourCell.textContent = to12(hr); row.appendChild(hourCell);
@@ -384,7 +410,7 @@
     function dayIndexFromName(n){ return DAYS.indexOf(n); }
 
     function detectNow(){
-      const d = DAYS[todayIndex()] || 'Lunes';
+      const d = (TEST_OVERRIDE && TEST_OVERRIDE.enabled) ? DAYS[TEST_OVERRIDE.dayIndex] : (DAYS[todayIndex()] || 'Lunes');
       renderDay(d, true);
     }
 
@@ -469,30 +495,37 @@
       const nextIndexes = new Set();
       let firstNowIndex = -1;
       if(!highlightNow) return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
-  // Umbrales (minutos)
-  const nearThreshold = 20; // minutos antes
+      // Umbrales (minutos)
+      const nearThreshold = 20; // minutos antes
 
+      // helper: normalizar títulos para comparación tolerante
+      const norm = s => (s||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s]+/g,'').trim();
+
+      // buscar índice del evento actual (si existe)
+      let nowIndex = -1;
       for(let i=0;i<list.length;i++){
         const ev = list[i];
-        let start = toMin(ev.h), end = toMin(ev.e);
-        // Si ahora está dentro del evento
-        if(nowMin>=start && nowMin<end){
-          // marcar sólo el evento actual (no unir consecutivos)
-          firstNowIndex = i;
-          nowIndexes.add(i);
-          // la siguiente inmediata
-          if(i+1 < list.length) nextIndexes.add(i+1);
-          break; // ya encontramos el evento actual
-        }
-        // Si ahora está antes del evento pero dentro del umbral 'near'
-        if(nowMin < start && (start - nowMin) <= nearThreshold){
-          nearIndexes.add(i);
-          // no rompemos: puede haber otro más cercano
-        }
-        // Si ahora está antes y no dentro de near y no hay now, marcar el primer futuro como next
-        if(nowMin < start && nextIndexes.size===0 && nowIndexes.size===0){
-          nextIndexes.add(i); break;
-        }
+        const start = toMin(ev.h), end = toMin(ev.e);
+        if(nowMin >= start && nowMin < end){ nowIndex = i; break; }
+      }
+
+      if(nowIndex !== -1){
+        firstNowIndex = nowIndex;
+        // marcar el bloque consecutivo con el mismo título como 'now'
+        const base = norm(list[nowIndex].t);
+        let j = nowIndex;
+        while(j < list.length && norm(list[j].t) === base){ nowIndexes.add(j); j++; }
+        // la primera siguiente distinta (si existe) marcar como next
+        if(j < list.length) nextIndexes.add(j);
+        return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
+      }
+
+      // Si no hay 'now', marcar near (dentro de umbral) y next (primer futuro)
+      for(let i=0;i<list.length;i++){
+        const ev = list[i];
+        const start = toMin(ev.h), end = toMin(ev.e);
+        if(nowMin < start && (start - nowMin) <= nearThreshold){ nearIndexes.add(i); }
+        if(nowMin < start && nextIndexes.size===0){ nextIndexes.add(i); break; }
       }
       return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
     }
