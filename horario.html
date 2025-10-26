@@ -32,6 +32,96 @@
   --c-nego: linear-gradient(135deg,#ff5e6c,#ff8a3d);
   --c-ingles: linear-gradient(135deg,#23d6b4,#017f73);
     }
+    /* Tema claro/diurno (sobrescribe variables) */
+    .light-theme{
+      --bg: #f6f9ff;
+      --panel: #ffffff;
+      --panel-2: #f0f6ff;
+      --text: #0b1a2b;
+      --muted: #516a86;
+      --grid: #d7e3f7;
+    }
+    /* Overrides para elementos que usaban fondos semitransparentes oscuros */
+    .light-theme #scheduleMenu{
+      background: rgba(255,255,255,0.96);
+      border: 1px solid rgba(10,20,40,0.06);
+      box-shadow: 0 10px 30px rgba(20,40,80,0.06);
+      color: var(--text);
+    }
+    .light-theme #scheduleMenu .menu-desc{ color:var(--muted); }
+    .light-theme .menu-actions button.chip{ background: linear-gradient(180deg, rgba(125,91,255,0.06), rgba(125,91,255,0.03)); color:var(--text); }
+    .light-theme .card{ background: var(--panel); border:1px solid rgba(10,30,60,0.06); box-shadow:0 8px 22px rgba(15,30,60,0.04); color:var(--text) }
+    .light-theme .card:before{ background: linear-gradient(120deg, transparent, rgba(10,20,40,0.03), transparent); }
+    .light-theme .legend{ background: transparent }
+    .light-theme .mini{ color:var(--text); box-shadow: inset 0 0 0 1px rgba(3,12,30,0.02), 0 8px 18px rgba(10,20,40,0.03) }
+    /* Spinner más oscuro en tema claro */
+    .light-theme .spinner{ border:2px solid rgba(0,0,0,0.08); border-top-color: rgba(0,0,0,0.45); }
+
+    /* Animaciones: adaptar brillo/colores para que funcionen sobre fondo claro */
+    .light-theme .now.animated::after{ background: radial-gradient(600px 200px at 20% 0%, rgba(125,91,255,0.14), transparent 40%); mix-blend-mode: multiply; }
+    .light-theme .near.animated::after{ background: linear-gradient(90deg, rgba(0,0,0,0.02), rgba(0,0,0,0.04), rgba(0,0,0,0.02)); }
+    .light-theme .next.animated::after{ background: radial-gradient(600px 200px at 20% 0%, rgba(125,91,255,0.06), transparent 40%); }
+    .light-theme .now.animated{ box-shadow:0 10px 30px rgba(125,91,255,0.06); }
+    .light-theme .near.animated{ box-shadow:0 8px 20px rgba(0,0,0,0.05); }
+    /* En modo diurno: overlay más visible del color de la materia sobre la card 'now'.
+       Añadimos una capa difusa + una capa de brillo sutil con pulso para resaltar el color
+       sin tocar las reglas ni animaciones del modo nocturno. Respeta prefers-reduced-motion. */
+    @keyframes subtlePulse { 0% { transform: scale(1); opacity: 0.42 } 50% { transform: scale(1.03); opacity: 0.58 } 100% { transform: scale(1); opacity: 0.42 } }
+
+    .light-theme .card.now::before{
+      content: '';
+      position: absolute; inset: 0; border-radius: 16px; pointer-events: none;
+      /* usar gradiente si existe, sino la versión con alpha de acento; intensidad media */
+      background: var(--subject-bg, var(--subject-accent, rgba(125,91,255,0.22)));
+      opacity: 0.45; /* intensidad media: ni muy fuerte ni muy leve */
+      filter: blur(6px) saturate(1.08);
+      mix-blend-mode: multiply;
+      transition: opacity .22s ease, transform .22s ease;
+      z-index: 0;
+    }
+    /* fina capa extra para dar brillo y textura encima del tintado (muy sutil) */
+    .light-theme .card.now::after{
+      content: '';
+      position: absolute; inset: 6px; border-radius: 12px; pointer-events: none;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.02));
+      opacity: 0.12;
+      transform: translateZ(0);
+      transition: transform .28s ease, opacity .28s ease;
+      z-index: 0;
+    }
+    /* animar ligeramente solo si el card tiene la clase .animated (preserva reduced-motion) */
+    .light-theme .card.now.animated::before{ animation: subtlePulse 2.6s ease-in-out infinite; }
+
+    @media (prefers-reduced-motion: reduce){
+      .light-theme .card.now.animated::before{ animation: none; }
+    }
+
+   /* asegurar que el contenido textual de la card quede por encima del overlay
+     (evitar aplicar position:relative a elementos absolutamente posicionados
+     como .badge, ya que en tema claro provocaba que el badge perdiera su
+     posicionamiento y apareciera dentro del flujo). */
+   .light-theme .card.now .title,
+   .light-theme .card.now .meta,
+   .light-theme .card.now .chip { position: relative; z-index: 1 }
+    /* Intensificar color del card actual en modo diurno usando --subject-accent (inline desde JS)
+       Aplicamos un overlay tintado a la propia tarjeta (no al texto) para que el color se vea
+       en el fondo de la card; mantenemos la legibilidad del texto por encima. */
+    .light-theme .card.now{
+      border: 1px solid rgba(0,0,0,0.04);
+      /* sombra externa suave con color ligeramente mezclado para dar presencia sin saturar */
+      box-shadow: 0 18px 40px rgba(0,0,0,0.06), 0 6px 18px rgba(0,0,0,0.04);
+      background: var(--panel);
+    }
+    /* reforzar el tintado del fondo mediante el pseudo-elemento ::before (más visible en modo claro) */
+    /* (nota: ::before ya definida arriba con más intensidad; aquí dejamos una ligera compatibilidad)
+       No duplicar comportamiento; la primera definición controla el tintado final. */
+    /* mantener el brillo/textura fina encima del tintado */
+    .light-theme .card.now::after{ opacity: 0.12 }
+
+    /* Asegurar que los iconos se coloreen correctamente en tema claro */
+    .light-theme .icon-btn svg{ color: var(--muted); }
+    /* transición suave al cambiar tema */
+    html, body, .card, .mini, .chip, button{ transition: background-color 220ms ease, color 220ms ease, border-color 220ms ease, box-shadow 220ms ease; }
     html,body{height:100%}
     body{
       margin:0; font-family:Inter,system-ui,Segoe UI,Roboto,Helvetica,Arial; color:var(--text);
@@ -57,6 +147,18 @@
   .icon-btn{width:46px;height:46px;display:inline-flex;align-items:center;justify-content:center;border-radius:12px;padding:8px}
   .icon-btn svg{color:var(--muted); width:20px;height:20px}
 
+  /* Tema toggle button: visualmente igual a otros icon-btn */
+  #btnToggleTheme{ width:46px; height:46px; display:inline-flex; align-items:center; justify-content:center; border-radius:12px; padding:8px; background:var(--panel); border:1px solid #223150; color:var(--muted); }
+  /* label hidden to match other toolbar icons */
+  .btn-label{ display:none }
+  /* mostrar icono de sol en tema claro, luna en tema oscuro */
+  .icon-sun{ display:none }
+  .icon-moon{ display:none }
+  .light-theme .icon-sun{ display:inline }
+  body:not(.light-theme) .icon-moon{ display:inline }
+  /* focus visible */
+  #btnToggleTheme:focus{ outline:3px solid rgba(125,91,255,0.12); outline-offset:2px }
+
   /* Vista móvil: lista por día */
   .day-view{display:grid; gap:12px; margin-top:20px}
     .day-picker{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
@@ -66,7 +168,7 @@
   /* más espacio entre cards en móvil */
   @media (max-width:899px){ .day-view .card{margin-bottom:12px} }
     .card:before{content:""; position:absolute; inset:-1px; border-radius:16px; padding:1px; background:linear-gradient(120deg,transparent,rgba(255,255,255,.06),transparent); -webkit-mask:linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
-      -webkit-mask-composite: xor; mask-composite:exclude; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);}
+      -webkit-mask-composite: xor; mask-composite:exclude; mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); pointer-events:none; }
   .card .title{font-weight:700; font-size:19px; line-height:1.05}
   .card .meta{font-size:14px; color:var(--muted)}
     .chip{display:inline-block; font-size:11px; padding:.22rem .5rem; border-radius:999px; background:#0c1430; border:1px solid #1c2b52; color:#b9cffb}
@@ -86,11 +188,15 @@
     .now{outline:1px solid rgba(255,255,255,.15); box-shadow:0 0 0 2px #92a7ff2e, 0 0 24px #7d5bff55}
     .now .title{filter:drop-shadow(0 2px 10px #7a59ff88)}
   /* siguiente clase destacada (leve) */
-  .next{box-shadow:0 8px 18px rgba(0,0,0,.45); transform:translateY(-2px); border:1px solid rgba(255,255,255,.04)}
+  .next{box-shadow:0 8px 18px rgba(0,0,0,.45); transform:scale(1.005); border:1px solid rgba(255,255,255,.04)}
   /* estados de alumbrado: dim (lejano), near (casi), now (actual) */
   .dim{opacity:0.65; filter:grayscale(.15) brightness(.9); transform:none}
-  .near{opacity:0.9; transform:translateY(-4px) scale(1.02); box-shadow:0 12px 30px rgba(0,0,0,.5)}
-  .now{opacity:1; transform:translateY(-6px) scale(1.035); box-shadow:0 18px 48px rgba(122,89,255,.25); border:1px solid rgba(255,255,255,.06)}
+  /* Evitar desplazamiento vertical que provoca desalineación visual al resaltar
+    (antes se usaba translateY negativo). Ahora sólo escalamos levemente para
+    mantener el énfasis sin mover el flujo del documento. Esto corrige el
+    efecto "desfasado" respecto al encabezado/tiempo actual en vista móvil. */
+  .near{opacity:0.94; transform:scale(1.01); box-shadow:0 10px 24px rgba(0,0,0,.32)}
+  .now{opacity:1; transform:scale(1.02); box-shadow:0 18px 48px rgba(122,89,255,.22); border:1px solid rgba(255,255,255,.06)}
 
   /* Animaciones para indicar actividad */
   @keyframes pulseGlow{ 0%{ box-shadow:0 6px 18px rgba(122,89,255,0.12)} 50%{ box-shadow:0 22px 56px rgba(122,89,255,0.28)} 100%{ box-shadow:0 6px 18px rgba(122,89,255,0.12)} }
@@ -100,7 +206,7 @@
   .near.animated{ background: linear-gradient(90deg, rgba(255,255,255,0.03) 0%, rgba(255,255,255,0.06) 50%, rgba(255,255,255,0.03) 100%); background-size: 200% 100%; animation: shimmer 3s linear infinite; }
   /* next (siguiente) - brillo leve y animado */
   .next.animated{ background: linear-gradient(90deg, rgba(255,255,255,0.015) 0%, rgba(255,255,255,0.035) 50%, rgba(255,255,255,0.015) 100%); background-size:200% 100%; animation: shimmer 4s linear infinite; box-shadow:0 10px 30px rgba(125,89,255,0.08); }
-  .next{ transform:translateY(-4px); }
+  .next{ transform:scale(1.005); }
 
   /* Respect user preference for reduced motion */
   @media (prefers-reduced-motion: reduce){
@@ -169,6 +275,16 @@
 
     /* mini-specific overlay radius */
     .mini.now.animated::after, .mini.near.animated::after{ border-radius:10px }
+    /* realce temporal para inicio de semana en vista semanal */
+    .start-highlight{ outline:3px solid rgba(125,91,255,0.14); box-shadow:0 12px 30px rgba(125,91,255,0.06); }
+  /* botón de 'Ver inicio de semana' más visible */
+  #btnGotoStartWeek{ padding:10px 14px; font-size:14px; border-radius:10px; background:linear-gradient(180deg, rgba(125,91,255,0.12), rgba(125,91,255,0.06)); border:1px solid rgba(125,91,255,0.12); color:var(--text); cursor:pointer }
+  #btnGotoStartWeek:hover{ transform:translateY(-2px); box-shadow:0 10px 30px rgba(125,91,255,0.06) }
+  /* spinner pequeño para acciones */
+  .spinner{ display:inline-block; width:12px; height:12px; border:2px solid rgba(255,255,255,0.18); border-top-color:rgba(255,255,255,0.9); border-radius:50%; margin-right:8px; vertical-align:middle; animation:spin .9s linear infinite }
+  @keyframes spin{ to{ transform:rotate(360deg); } }
+  /* estado loading en botones */
+  .chip.loading{ opacity:0.9; transform:none; pointer-events:none }
   </style>
 </head>
 <body>
@@ -180,6 +296,7 @@
           <div>
             <div id="currentDay" style="font-weight:700;font-size:18px"></div>
             <div id="currentDate" style="color:var(--muted);font-size:13px"></div>
+          <!-- (Tema) moved into toolbar to match other controls -->
           </div>
           <div style="text-align:right">
             <div id="currentTime" style="font-weight:700;font-size:18px"></div>
@@ -223,6 +340,18 @@
           </button>
           <!-- Icon button: alternar formato 12/24 -->
           <button id="btnToggleFormat" title="Cambiar formato 12/24" aria-label="Cambiar formato" class="icon-btn">12/24</button>
+          <!-- Icon button: alternar tema claro/nocturno (ubicado con los demás botones) -->
+          <button id="btnToggleTheme" title="Alternar tema claro/nocturno" aria-label="Alternar tema" class="icon-btn" aria-pressed="false">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <g class="icon-sun" fill="currentColor">
+                <circle cx="12" cy="12" r="4" />
+                <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41" stroke="currentColor" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+              </g>
+              <g class="icon-moon" fill="currentColor">
+                <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+              </g>
+            </svg>
+          </button>
         </div>
       </div>
     </header>
@@ -425,6 +554,17 @@
       scheduleMenu.addEventListener('click', (ev)=> ev.stopPropagation());
     }
 
+    // Delegated handler: asegurar que cualquier botón creado dinámicamente con id 'btnGotoStartWeek' funcione
+    document.addEventListener('click', (ev)=>{
+      try{
+        const el = ev.target && ev.target.closest ? ev.target.closest('#btnGotoStartWeek') : null;
+        if(el){
+          console.debug('[debug] delegated click on #btnGotoStartWeek');
+          ev.preventDefault(); gotoStartOfWeek();
+        }
+      }catch(e){ /* no bloquear */ }
+    });
+
     function getTestNowMin(){
       if(TEST_OVERRIDE && TEST_OVERRIDE.enabled){
         // usar la hora de la franja en HOURS (definida más abajo). Si HOURS aún no existe, calcular desde HORARIO.times
@@ -466,6 +606,10 @@
       list.forEach((ev, idx)=>{
         const card = document.createElement('div');
         card.className = 'card';
+  // No añadir la clase de materia directamente (ev.k) porque hay reglas globales
+  // como `.apps { background: ... }` que afectan el modo nocturno. En su lugar
+  // guardamos el identificador en data-subject y usamos --subject-bg para el overlay.
+  if(ev.k) card.dataset.subject = ev.k;
         // aplicar clases según marks: dim por defecto
         card.classList.add('dim');
         if(marks.nowIndexes.has(idx)){
@@ -495,9 +639,39 @@
           <div class="meta" style="margin-top:6px">${ev.p}</div>
           <span class="badge ${ev.k}">${ev.d}</span>
         `;
+        // establecer una variable CSS --subject-bg con el fondo de la materia para uso en tema claro
+        try{
+          const cssVarMap = { integ: 'integradora' };
+          const varName = cssVarMap[ev.k] || ev.k;
+          let bgVal = getComputedStyle(document.documentElement).getPropertyValue(`--c-${varName}`) || '';
+          if(!bgVal || !bgVal.trim()){
+            const tmp = document.createElement('div'); tmp.style.display='none'; tmp.className = ev.k; document.body.appendChild(tmp);
+            bgVal = getComputedStyle(tmp).background || '';
+            document.body.removeChild(tmp);
+          }
+          if(bgVal && bgVal.trim()) card.style.setProperty('--subject-bg', bgVal.trim());
+            // establecer un color sólido de acento para usos como box-shadow/borde en modo diurno
+            const accentMap = {
+              apps: '#00a974',
+              gestion: '#1979e0',
+              movil: '#4b45ff',
+              integradora: '#ff6fb1',
+              optativa: '#9a00ff',
+              nego: '#ff6f52',
+              ingles: '#07b59a'
+            };
+            const cssKey = (cssVarMap[ev.k] || ev.k) || ev.k;
+            const accent = accentMap[cssKey] || '#7d5bff';
+            // crear una versión con alpha (hex 8 dígitos) para sombras más visibles en modo claro
+            const accentAlpha = (accent.length === 7) ? (accent + 'CC') : accent;
+            card.style.setProperty('--subject-accent', accentAlpha);
+            card.style.setProperty('--subject-accent-solid', accent);
+        }catch(e){/* noop */}
         // scroll al primer ahora
         if(marks.firstNowIndex===idx && !scrolled){
-          setTimeout(()=> card.scrollIntoView({behavior:'smooth', block:'center'}), 50);
+          // usar 'nearest' para evitar que el scroll centre la tarjeta y cause
+          // desalineación visual con el encabezado fijo/fluido en dispositivos móviles
+          setTimeout(()=> card.scrollIntoView({behavior:'smooth', block:'nearest'}), 50);
           scrolled=true;
         }
         dayCards.appendChild(card);
@@ -513,15 +687,35 @@
           <div class="title">${title}</div>
           <div class="meta">${sub}</div>
           <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
-            <button id="btnGotoStartWeek" class="chip">Ver inicio de semana</button>
+            <button id="btnGotoStartWeek" type="button" class="chip" aria-live="polite" onclick="gotoStartOfWeek();">
+              <span class="spinner" aria-hidden="true" style="display:none"></span>
+              <span class="btn-text">Ver inicio de semana</span>
+            </button>
           </div>
         `;
+        // comportamiento: botón para navegar al inicio de la semana (con animación de carga)
+        const btn = empty.querySelector('#btnGotoStartWeek');
+        if(btn){
+          btn.addEventListener('click', ()=>{
+            try{
+              const spinner = btn.querySelector('.spinner');
+              const txt = btn.querySelector('.btn-text');
+              // mostrar spinner
+              if(spinner) spinner.style.display = 'inline-block';
+              btn.classList.add('loading');
+              if(txt) txt.textContent = 'Cargando...';
+              // ejecutar la acción (gotoStartOfWeek es rápida, pero mantenemos el estado un momento)
+              gotoStartOfWeek();
+              // reactivar después de 1s (suficiente para la animación de la vista)
+              setTimeout(()=>{
+                if(spinner) spinner.style.display = 'none';
+                btn.classList.remove('loading');
+                if(txt) txt.textContent = 'Ver inicio de semana';
+              }, 1000);
+            }catch(e){ console.error(e); }
+          });
+        }
         dayCards.appendChild(empty);
-        // comportamiento: botones para navegación
-        setTimeout(()=>{
-          const btn = document.getElementById('btnGotoStartWeek');
-          if(btn) btn.addEventListener('click', ()=>{ const first = DAYS[0] || 'Lunes'; renderDay(first, true); });
-        },40);
       }
     }
 
@@ -534,6 +728,7 @@
     function renderWeek(){
       weekBody.innerHTML='';
       const nowMin = getTestNowMin();
+      const localDay = localWeekdayName();
       HOURS.forEach(hr=>{
         const row = document.createElement('div'); row.className = 'row';
         const hourCell = document.createElement('div'); hourCell.className = 'hour'; hourCell.textContent = to12(hr); row.appendChild(hourCell);
@@ -542,7 +737,9 @@
           const items = EVENTS.filter(e=>e.d===day && e.h===hr);
           // compute marks for this day's items to decide nearest
           const dayList = EVENTS.filter(e=>e.d===day).sort((a,b)=> toMin(a.h)-toMin(b.h));
-          const dayMarks = computeNowHighlight(dayList, nowMin, true);
+          // solo permitir detección "now"/animada si es el día local
+          const isToday = (day === localDay);
+          const dayMarks = computeNowHighlight(dayList, nowMin, isToday);
           let nearestIdxForDay = -1;
           if(dayMarks.nowIndexes.size===0){
             if(dayMarks.nearIndexes.size>0) nearestIdxForDay = Math.min(...Array.from(dayMarks.nearIndexes));
@@ -564,14 +761,16 @@
             // detectar estado ahora / cerca para la mini-card
             const start = toMin(ev.h), end = toMin(ev.e);
             if(nowMin >= start && nowMin < end){
-              mini.classList.remove('dim'); mini.classList.add('now','animated');
+              mini.classList.remove('dim'); mini.classList.add('now');
+              if(isToday) mini.classList.add('animated');
             } else {
               // find index of this ev within dayList to compare with nearestIdxForDay
               const idxInDay = dayList.findIndex(x=> x.h===ev.h && x.t===ev.t && x.a===ev.a);
               if(nearestIdxForDay===idxInDay){
-                // animate only the nearest upcoming if no now
-                if(dayMarks.nearIndexes.has(idxInDay)) mini.classList.remove('dim'), mini.classList.add('near','animated');
-                else mini.classList.remove('dim'), mini.classList.add('next','animated');
+                // nearest upcoming: always mark near/next but animate only on today's column
+                if(dayMarks.nearIndexes.has(idxInDay)) mini.classList.remove('dim'), mini.classList.add('near');
+                else mini.classList.remove('dim'), mini.classList.add('next');
+                if(isToday) mini.classList.add('animated');
               } else if(nowMin < start && (start - nowMin) <= 20){
                 mini.classList.remove('dim'); mini.classList.add('near');
               } else if(nowMin < start){
@@ -603,6 +802,44 @@
       const localDay = localWeekdayName();
       const d = (TEST_OVERRIDE && TEST_OVERRIDE.enabled) ? DAYS[TEST_OVERRIDE.dayIndex] : localDay;
       renderDay(d, true);
+    }
+
+    /* Navegar al inicio de la semana (día 0) — muestra día o la vista semanal según ancho */
+    function gotoStartOfWeek(){
+      const first = DAYS[0] || 'Lunes';
+      // si estamos en escritorio, mostrar la vista semanal y resaltar la columna
+      if(window.matchMedia && window.matchMedia('(min-width:900px)').matches){
+        renderWeek();
+        // resaltar columna correspondiente al primer día por 2.5s
+        const header = document.querySelector('.week .header');
+        if(header){
+          // header children: [Hora, Lunes, Martes, ...]
+          const cols = Array.from(header.children);
+          let colIndex = cols.findIndex(n=> n.textContent.trim() === first);
+          if(colIndex >= 0){
+            const hdr = cols[colIndex]; hdr.classList.add('start-highlight');
+            // resaltar las celdas de cada fila en esa columna
+            const rows = document.querySelectorAll('.week .row');
+            rows.forEach(r=>{ const cell = r.children[colIndex]; if(cell) cell.classList.add('start-highlight'); });
+            // scroll to week container top
+            const w = document.querySelector('.week'); if(w) w.scrollIntoView({behavior:'smooth', block:'start'});
+            setTimeout(()=>{
+              hdr.classList.remove('start-highlight');
+              rows.forEach(r=>{ const cell = r.children[colIndex]; if(cell) cell.classList.remove('start-highlight'); });
+            }, 2500);
+          }
+        }
+      } else {
+        // móvil: mostrar el día en la vista por día
+          // si existe select, setear el valor
+          const sel = document.getElementById('daySelect');
+          if(sel){ const opt = Array.from(sel.options).find(o=> o.value === first); if(opt) sel.value = first; }
+          // sólo activar el resaltado/animación si el primer día coincide con el día local
+          const localDayName = localWeekdayName();
+          renderDay(first, first === localDayName);
+        // asegurar que la sección day-view esté visible (si el CSS cambia entre mobile/desktop)
+        const dv = document.getElementById('dayView'); if(dv) dv.scrollIntoView({behavior:'smooth', block:'start'});
+      }
     }
 
     // Toggle selector de día (móvil)
@@ -685,22 +922,33 @@
       const nearIndexes = new Set();
       const nextIndexes = new Set();
       let firstNowIndex = -1;
-      if(!highlightNow) return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
       // Umbrales (minutos)
       const nearThreshold = 20; // minutos antes
 
       // helper: normalizar títulos para comparación tolerante
       const norm = s => (s||'').toLowerCase().replace(/\(.*?\)/g,'').replace(/[^a-z0-9\s]+/g,'').trim();
 
-      // buscar índice del evento actual (si existe)
+      // Normaliza intervalos y admite eventos que crucen la medianoche
+      const normalizeTimes = (startStr, endStr) => {
+        let s = toMin(startStr), e = toMin(endStr);
+        if(e <= s) e += 24*60; // evento cruza a la siguiente jornada
+        return [s,e];
+      };
+
+      // Consideramos también nowMin + 24*60 para detectar en cruces de día
+      const nowAlt = nowMin + 24*60;
+
+      // buscar índice del evento actual (si existe) — solo marcar now si highlightNow === true
       let nowIndex = -1;
       for(let i=0;i<list.length;i++){
         const ev = list[i];
-        const start = toMin(ev.h), end = toMin(ev.e);
-        if(nowMin >= start && nowMin < end){ nowIndex = i; break; }
+        const [start, end] = normalizeTimes(ev.h, ev.e);
+        if((nowMin >= start && nowMin < end) || (nowAlt >= start && nowAlt < end)){
+          nowIndex = i; break;
+        }
       }
 
-      if(nowIndex !== -1){
+      if(nowIndex !== -1 && highlightNow){
         firstNowIndex = nowIndex;
         // marcar el bloque consecutivo con el mismo título como 'now'
         const base = norm(list[nowIndex].t);
@@ -711,15 +959,65 @@
         return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
       }
 
-      // Si no hay 'now', marcar near (dentro de umbral) y next (primer futuro)
+      // Si no hay 'now' (o no está permitido), marcar near (dentro de umbral) y next (primer futuro)
       for(let i=0;i<list.length;i++){
         const ev = list[i];
-        const start = toMin(ev.h), end = toMin(ev.e);
-        if(nowMin < start && (start - nowMin) <= nearThreshold){ nearIndexes.add(i); }
-        if(nowMin < start && nextIndexes.size===0){ nextIndexes.add(i); break; }
+        let [start, end] = normalizeTimes(ev.h, ev.e);
+        // near: dentro de threshold (considerando now y nowAlt)
+        if((nowMin < start && (start - nowMin) <= nearThreshold) || (nowAlt < start && (start - nowAlt) <= nearThreshold)){
+          nearIndexes.add(i);
+        }
+        // next: primer futuro (considerando nowAlt)
+        if(((nowMin < start) || (nowAlt < start)) && nextIndexes.size===0){ nextIndexes.add(i); }
       }
       return {nowIndexes, nearIndexes, nextIndexes, firstNowIndex};
     }
+  </script>
+  <script>
+    // Theme (diurno/nocturno) toggle
+    (function(){
+      const THEME_KEY = 'themePref'; // 'light' or 'dark' (if absent => follow system)
+      const metaTheme = document.querySelector('meta[name="theme-color"]');
+      function getSaved(){ try{ return localStorage.getItem(THEME_KEY); }catch(e){return null} }
+      function detectSystem(){ return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'; }
+      function applyTheme(t){
+        if(t === 'light') {
+          document.body.classList.add('light-theme');
+        } else {
+          document.body.classList.remove('light-theme');
+        }
+        // update meta theme-color for mobile UI
+        try{
+          if(metaTheme){ metaTheme.setAttribute('content', t === 'light' ? '#f6f9ff' : '#0b0f17'); }
+        }catch(e){}
+        // update aria-pressed
+        const btn = document.getElementById('btnToggleTheme'); if(btn) btn.setAttribute('aria-pressed', t === 'dark' ? 'true' : 'false');
+      }
+      function initTheme(){
+        const saved = getSaved();
+        if(saved){ applyTheme(saved); }
+        else { applyTheme(detectSystem()); }
+        // listen to system changes only when user hasn't chosen a pref
+        if(!saved && window.matchMedia){
+          const mq = window.matchMedia('(prefers-color-scheme: dark)');
+          const listener = (e)=> applyTheme(e.matches ? 'dark' : 'light');
+          if(mq.addEventListener) mq.addEventListener('change', listener);
+          else if(mq.addListener) mq.addListener(listener);
+        }
+      }
+      function toggleTheme(){
+        const saved = getSaved();
+        let next;
+        if(saved){ next = saved === 'light' ? 'dark' : 'light'; }
+        else { next = document.body.classList.contains('light-theme') ? 'dark' : 'light'; }
+        try{ localStorage.setItem(THEME_KEY, next); }catch(e){}
+        applyTheme(next);
+      }
+      // attach
+      const btn = document.getElementById('btnToggleTheme'); if(btn){ btn.addEventListener('click', ()=> toggleTheme()); }
+      // init immediately
+      initTheme();
+    })();
   </script>
   <script src="./register.js"></script>
 </body>

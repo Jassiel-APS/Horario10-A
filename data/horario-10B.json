@@ -1,9 +1,10 @@
 {
   "name": "Horario ejemplo 10B - incluye Sábado",
-  "days": ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],
-  "hours": ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"],
+  "days": ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado","Domingo"],
+  "hours": ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00","21:00","22:00","23:00","00:00","01:00","02:00","03:00","04:00"],
   "events": [
     { "d":"Sábado", "h":"09:00", "e":"10:00", "t":"Taller de Programación", "a":"Lab 1", "p":"Profe Ejemplo", "k":"apps" },
+  { "d":"Sábado", "h":"09:00", "e":"10:00", "t":"Clase extra matutina", "a":"Aula 7", "p":"Profe Extra", "k":"apps" },
     { "d":"Sábado", "h":"10:00", "e":"11:00", "t":"Revisión de proyectos", "a":"Lab 1", "p":"Profe Ejemplo", "k":"integ" },
     { "d":"Sábado", "h":"11:00", "e":"12:00", "t":"Inglés práctico", "a":"Aula 4", "p":"Profe Inglés", "k":"ingles" },
     { "d":"Sábado", "h":"13:00", "e":"14:00", "t":"Sesión de dudas (optativa)", "a":"Aula 3", "p":"Profe Optativa", "k":"optativa" },
@@ -61,6 +62,14 @@
   { "d":"Sábado", "h":"17:00", "e":"18:00", "t":"Revisión de proyectos (tarde)", "a":"Lab 1", "p":"Profe Ejemplo", "k":"integ" },
   { "d":"Sábado", "h":"18:00", "e":"19:00", "t":"Inglés práctico (tarde)", "a":"Aula 4", "p":"Profe Inglés", "k":"ingles" },
   { "d":"Sábado", "h":"19:00", "e":"20:00", "t":"Sesión de dudas (optativa)", "a":"Aula 3", "p":"Profe Optativa", "k":"optativa" },
-  { "d":"Sábado", "h":"20:00", "e":"21:00", "t":"Mesa redonda: Innovación", "a":"Aula 6", "p":"Invitados", "k":"apps" }
+  { "d":"Sábado", "h":"20:00", "e":"21:00", "t":"Mesa redonda: Innovación", "a":"Aula 6", "p":"Invitados", "k":"apps" },
+  { "d":"Sábado", "h":"21:00", "e":"22:00", "t":"Clase extra nocturna", "a":"Aula 7", "p":"Profe Extra", "k":"apps" },
+  { "d":"Sábado", "h":"22:00", "e":"23:00", "t":"Seminario nocturno: Buenas prácticas", "a":"Aula 8", "p":"Prof. Nocturno", "k":"apps" },
+  { "d":"Sábado", "h":"23:00", "e":"00:00", "t":"Mesa de dudas nocturna", "a":"Aula 9", "p":"Equipo Docente", "k":"integ" },
+  { "d":"Domingo", "h":"00:00", "e":"01:00", "t":"Curso nocturno: Técnicas prácticas", "a":"Aula 9", "p":"Profe Nocturno", "k":"apps" },
+  { "d":"Domingo", "h":"01:00", "e":"02:00", "t":"Tutoría nocturna: dudas y repaso", "a":"Aula 9", "p":"Equipo Docente", "k":"integ" },
+  { "d":"Domingo", "h":"02:00", "e":"03:00", "t":"Laboratorio nocturno: servidores", "a":"Lab 1", "p":"Profe Lab", "k":"apps" },
+  { "d":"Domingo", "h":"03:00", "e":"04:00", "t":"Seminario: buenas prácticas (noche)", "a":"Aula 8", "p":"Prof. Nocturno", "k":"apps" },
+  { "d":"Domingo", "h":"04:00", "e":"05:00", "t":"Cierre y retroalimentación nocturna", "a":"Aula 10", "p":"Coordinación Nocturna", "k":"integ" }
   ]
 }
