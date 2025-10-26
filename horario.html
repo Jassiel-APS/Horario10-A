@@ -143,6 +143,30 @@
     .day-picker{z-index:40}
     .toolbar{position:relative; z-index:20}
 
+  /* Schedule menu styles */
+    #scheduleMenu{ padding:14px; max-width:360px; display:flex; flex-direction:column; align-items:stretch; gap:8px;
+      background: rgba(12,18,30,0.55);
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+      border:1px solid rgba(255,255,255,0.04);
+      border-radius:12px;
+      box-shadow:0 12px 40px rgba(2,6,23,0.6);
+      min-width:260px;
+      transition: transform 180ms ease, opacity 180ms ease;
+      opacity:0; transform:translateY(-8px); pointer-events:none;
+    }
+    #scheduleMenu.show{ opacity:1; transform:none; pointer-events:auto }
+  #scheduleMenu .menu-header{ display:flex; align-items:center; justify-content:space-between; gap:8px }
+  #scheduleMenu .menu-title{ font-weight:800; font-size:15px; color:var(--text) }
+  #scheduleMenu .menu-desc{ font-size:13px; color:var(--muted); margin-top:6px }
+  #scheduleList{ margin-top:12px; display:flex; flex-direction:column; gap:8px; max-height:320px; overflow:auto; padding-right:4px }
+  .schedule-item{ display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px 12px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.012), transparent); border:1px solid rgba(255,255,255,0.02); cursor:pointer }
+  .schedule-item:hover{ transform:translateY(-3px); box-shadow:0 10px 30px rgba(0,0,0,.4) }
+  .schedule-item.selected{ outline:2px solid rgba(125,91,255,0.18); box-shadow:0 14px 40px rgba(125,91,255,0.06) }
+  .schedule-meta{ font-size:12px; color:var(--muted) }
+  .menu-actions{ display:flex; gap:8px; margin-top:10px; justify-content:flex-end }
+  .menu-actions button{ padding:8px 12px; border-radius:8px }
+
     /* mini-specific overlay radius */
     .mini.now.animated::after, .mini.near.animated::after{ border-radius:10px }
   </style>
@@ -167,6 +191,32 @@
           <button id="btnToggleDay" title="Seleccionar día" aria-label="Seleccionar día" class="icon-btn"> 
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="3" y="4" width="18" height="18" rx="2" stroke="currentColor" stroke-width="1.5"/><path d="M16 2v4M8 2v4M3 10h18" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           </button>
+          <!-- Botón de ajustes: abre menú para seleccionar horario -->
+          <button id="btnOpenSchedules" title="Horario" aria-label="Abrir selector de horarios" class="icon-btn" style="position:relative">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M12 15.5A3.5 3.5 0 1 0 12 8.5a3.5 3.5 0 0 0 0 7zm7.2-3.5c0 .6-.05 1.2-.14 1.8l2.1 1.6a.5.5 0 0 1 .12.66l-2 3.46a.5.5 0 0 1-.61.22l-2.48-1a9.05 9.05 0 0 1-1.56.9l-.38 2.64a.5.5 0 0 1-.5.42h-4a.5.5 0 0 1-.5-.42l-.38-2.64c-.54-.22-1.05-.5-1.55-.83l-2.5 1a.5.5 0 0 1-.62-.2l-2-3.46a.5.5 0 0 1 .12-.66l2.1-1.6c-.09-.6-.14-1.2-.14-1.8s.05-1.2.14-1.8L2.3 8.6a.5.5 0 0 1-.12-.66l2-3.46a.5.5 0 0 1 .62-.2l2.5 1c.5-.33 1.01-.61 1.55-.83L9.6 1.2a.5.5 0 0 1 .5-.42h4c.24 0 .45.16.5.4l.38 2.63c.54.22 1.05.5 1.56.9l2.48-1a.5.5 0 0 1 .62.22l2 3.46a.5.5 0 0 1-.12.66l-2.1 1.6c.09.6.14 1.2.14 1.8z" stroke="currentColor" stroke-width="0" fill="currentColor"/></svg>
+          </button>
+          <div id="scheduleMenu" style="display:none; position:absolute; right:8px; top:70px; z-index:60; min-width:260px;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+              <div style="font-weight:700">Seleccionar horario</div>
+              <button id="closeScheduleMenu" class="icon-btn" title="Cerrar" aria-label="Cerrar menú" style="width:34px;height:34px;padding:6px">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 6l12 12M6 18L18 6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              </button>
+            </div>
+            <div class="menu-header">
+              <div>
+                <div class="menu-title">Seleccionar horario</div>
+                <div class="menu-desc">Elige un horario para cargarlo en este equipo. Puedes volver al horario local en cualquier momento.</div>
+              </div>
+              <div style="font-size:12px;color:var(--muted)">Guardado local</div>
+            </div>
+            <div id="scheduleList">
+              <!-- items cargados por JS -->
+            </div>
+            <div class="menu-actions">
+              <button id="btnResetSchedule" class="ghost">Restablecer local</button>
+              <button id="btnCloseMenu" class="chip">Cerrar</button>
+            </div>
+          </div>
           <!-- Icon button: mostrar/ocultar leyenda -->
           <button id="btnToggleLegend" title="Mostrar leyenda" aria-label="Mostrar legend" class="icon-btn">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M4 6h16M4 12h10M4 18h7" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -256,9 +306,124 @@
     const dayCards = document.getElementById('dayCards');
     DAYS.forEach(d=>{const o=document.createElement('option'); o.value=d; o.textContent=d; daySel.appendChild(o)});
 
-  // Modo de prueba: forzar Jueves 17:00 (slotIndex 2)
-  // Úsalo sólo mientras pruebas; deja el reloj con hora real.
-  const TEST_OVERRIDE = { enabled: false, dayIndex: 3, slotIndex: 2 };
+    // Modo de prueba: forzar Jueves 17:00 (slotIndex 2)
+    // Úsalo sólo mientras pruebas; deja el reloj con hora real.
+    const TEST_OVERRIDE = { enabled: false, dayIndex: 3, slotIndex: 2 };
+
+    /* ====== Multi-horario: cargar JSON desde data/ ====== */
+    // index.json contiene lista de horarios disponibles
+    const SCHEDULE_INDEX = 'data/index.json';
+
+    function applyScheduleObj(obj){
+      try{
+        if(!obj) return;
+        // aplicar días y horas si vienen — mutar los arrays existentes (DAYS/HOURS/EVENTS son const)
+        if(Array.isArray(obj.days) && obj.days.length) {
+          DAYS.length = 0; obj.days.forEach(d=> DAYS.push(d));
+        }
+        if(Array.isArray(obj.hours) && obj.hours.length) {
+          HOURS.length = 0; obj.hours.forEach(h=> HOURS.push(h));
+        }
+        if(Array.isArray(obj.events) && obj.events.length){
+          // Reemplazar EVENTS por el que viene en el JSON (mutando)
+          EVENTS.length = 0;
+          obj.events.forEach(ev=> EVENTS.push(ev));
+        }
+        // reconstruir UI dependiente
+        // actualizar daySelect options
+        daySel.innerHTML = '';
+        DAYS.forEach(d=>{const o=document.createElement('option'); o.value=d; o.textContent=d; daySel.appendChild(o)});
+  // re-render
+  buildLegend();
+  renderWeek();
+  // use detectNow so local day (weekend) is respected
+  detectNow();
+      }catch(err){ console.error('applyScheduleObj error', err); }
+    }
+
+    function createScheduleItem(name, file, selected){
+      const item = document.createElement('div'); item.className='schedule-item';
+      if(selected) item.classList.add('selected');
+      item.dataset.file = file || '__local';
+      const left = document.createElement('div'); left.style.display='flex'; left.style.flexDirection='column';
+      const title = document.createElement('div'); title.textContent = name; title.style.fontWeight='700';
+      const meta = document.createElement('div'); meta.className='schedule-meta'; meta.textContent = file || 'Horario local';
+      left.appendChild(title); left.appendChild(meta);
+      const right = document.createElement('div');
+      const btn = document.createElement('button'); btn.className='chip'; btn.textContent = selected ? 'Seleccionado' : 'Cargar';
+      btn.style.fontSize='12px'; btn.addEventListener('click', ()=>{
+        // aplicar
+        if(file && file !== '__local') loadScheduleFile(file);
+        else { localStorage.removeItem('selectedSchedule'); location.reload(); }
+      });
+      right.appendChild(btn);
+      item.appendChild(left); item.appendChild(right);
+      return item;
+    }
+
+    function loadSchedulesIndex(){
+      fetch(SCHEDULE_INDEX).then(r=>{
+        if(!r.ok) throw new Error('index not found');
+        return r.json();
+      }).then(list=>{
+        const container = document.getElementById('scheduleList');
+        container.innerHTML = '';
+        const prev = localStorage.getItem('selectedSchedule');
+        // añadir item local primero
+        container.appendChild(createScheduleItem('Horario local (por defecto)', '__local', !prev || prev==='__local'));
+        list.forEach(item=>{
+          const isSel = prev && prev === item.file;
+          const node = createScheduleItem(item.name, item.file, isSel);
+          container.appendChild(node);
+        });
+        // si hay selección previa cargarla
+        if(prev && prev !== '__local') loadScheduleFile(prev);
+      }).catch(err=>{
+        console.info('No index.json de horarios o error al cargar:', err);
+        // mostrar al menos opción local
+        const container = document.getElementById('scheduleList'); if(container) container.innerHTML = '';
+        container && container.appendChild(createScheduleItem('Horario local (por defecto)', '__local', true));
+      });
+    }
+
+    function loadScheduleFile(path){
+      fetch(path).then(r=>{ if(!r.ok) throw new Error('schedule not found'); return r.json(); }).then(obj=>{
+        applyScheduleObj(obj);
+        try{ localStorage.setItem('selectedSchedule', path); }catch(e){}
+      }).catch(err=>{
+        console.error('Error cargando horario', path, err);
+      });
+    }
+
+    // manejar reset/close botones del menú
+    document.getElementById('btnResetSchedule').addEventListener('click', ()=>{ localStorage.removeItem('selectedSchedule'); location.reload(); });
+    document.getElementById('btnCloseMenu').addEventListener('click', ()=>{ const m = document.getElementById('scheduleMenu'); if(m) m.style.display='none'; });
+
+    // iniciar carga de index (async). Si falla, quedan los datos inline como fallback.
+    loadSchedulesIndex();
+
+    // Toggle del menú de selección de horarios (abrir/cerrar)
+    const btnOpenSchedules = document.getElementById('btnOpenSchedules');
+    const scheduleMenu = document.getElementById('scheduleMenu');
+    const closeScheduleMenu = document.getElementById('closeScheduleMenu');
+    if(btnOpenSchedules && scheduleMenu){
+      btnOpenSchedules.addEventListener('click', (ev)=>{
+        ev.stopPropagation();
+        if(scheduleMenu.style.display === 'flex'){
+          scheduleMenu.classList.remove('show');
+          setTimeout(()=> scheduleMenu.style.display='none', 180);
+        } else {
+          scheduleMenu.style.display = 'flex';
+          // allow layout then animate
+          setTimeout(()=> scheduleMenu.classList.add('show'), 10);
+        }
+      });
+      closeScheduleMenu && closeScheduleMenu.addEventListener('click', ()=>{ scheduleMenu.classList.remove('show'); setTimeout(()=> scheduleMenu.style.display='none', 180); });
+      // cerrar al hacer click fuera
+      document.addEventListener('click', (ev)=>{ if(scheduleMenu.style.display==='flex' && !scheduleMenu.contains(ev.target) && ev.target !== btnOpenSchedules){ scheduleMenu.classList.remove('show'); setTimeout(()=> scheduleMenu.style.display='none', 180); } });
+      // evitar que el click dentro cierre el menú
+      scheduleMenu.addEventListener('click', (ev)=> ev.stopPropagation());
+    }
 
     function getTestNowMin(){
       if(TEST_OVERRIDE && TEST_OVERRIDE.enabled){
@@ -270,7 +435,12 @@
     }
 
     function renderDay(day, highlightNow=true){
-      daySel.value = day;
+      // intentar seleccionar el día en el select; si no existe, crear una opción temporal para mostrar el nombre local
+      // eliminar temp previa
+      const prevTemp = document.getElementById('tempDayOption'); if(prevTemp) prevTemp.remove();
+      const exists = Array.from(daySel.options).some(o=> o.value === day);
+      if(exists){ daySel.value = day; }
+      else { const opt = document.createElement('option'); opt.value = day; opt.textContent = day; opt.id = 'tempDayOption'; opt.selected = true; opt.disabled = true; daySel.appendChild(opt); }
       dayCards.innerHTML = '';
       const list = EVENTS.filter(e=>e.d===day).sort((a,b)=> toMin(a.h)-toMin(b.h));
   const nowMin = getTestNowMin();
@@ -335,8 +505,23 @@
       if(list.length===0){
         const empty=document.createElement('div');
         empty.className='card';
-        empty.innerHTML='<div class="title">Sin clases</div><div class="meta">Disfruta tu día ✨</div>';
+        // Mensaje contextual según el día
+        const isWeekend = (day === 'Sábado' || day === 'Domingo');
+        const title = isWeekend ? 'Hoy descansas 🛌' : 'Sin clases hoy';
+        const sub = isWeekend ? 'No tienes clases programadas para este día. ¡Aprovéchalo para descansar o avanzar en proyectos!' : 'Parece que no tienes clases registradas para este día. ¿Quieres ver el inicio de la semana?';
+        empty.innerHTML=`
+          <div class="title">${title}</div>
+          <div class="meta">${sub}</div>
+          <div style="margin-top:12px;display:flex;gap:8px;align-items:center">
+            <button id="btnGotoStartWeek" class="chip">Ver inicio de semana</button>
+          </div>
+        `;
         dayCards.appendChild(empty);
+        // comportamiento: botones para navegación
+        setTimeout(()=>{
+          const btn = document.getElementById('btnGotoStartWeek');
+          if(btn) btn.addEventListener('click', ()=>{ const first = DAYS[0] || 'Lunes'; renderDay(first, true); });
+        },40);
       }
     }
 
@@ -405,12 +590,18 @@
     /* ====== Detección de día/hora actual ====== */
     function todayIndex(){
       const i = new Date().getDay(); // 0=Dom,1=Lun…
-      return Math.min(Math.max(i-1,0),4); // 0..4
+      return Math.min(Math.max(i-1,0),4); // 0..4 (fallback to weekdays)
+    }
+    // Nombre del día local capitalizado (ej. 'Sábado')
+    function localWeekdayName(){
+      try{ const now = new Date(); const wd = now.toLocaleDateString(undefined, { weekday: 'long' }); return wd.charAt(0).toUpperCase() + wd.slice(1); }catch(e){ return DAYS[todayIndex()]; }
     }
     function dayIndexFromName(n){ return DAYS.indexOf(n); }
 
     function detectNow(){
-      const d = (TEST_OVERRIDE && TEST_OVERRIDE.enabled) ? DAYS[TEST_OVERRIDE.dayIndex] : (DAYS[todayIndex()] || 'Lunes');
+      // usar siempre el día local del sistema (esto permite mostrar "Hoy descansas" si no hay eventos)
+      const localDay = localWeekdayName();
+      const d = (TEST_OVERRIDE && TEST_OVERRIDE.enabled) ? DAYS[TEST_OVERRIDE.dayIndex] : localDay;
       renderDay(d, true);
     }
 
@@ -422,9 +613,9 @@
     // Inicializar UI
   renderWeek();
   detectNow();
-  // iniciar reloj y resaltado periódicos (cada 15s)
+    // iniciar reloj y resaltado periódicos (cada 15s) — usar detectNow para respetar día local
   updateClock();
-  setInterval(()=>{ updateClock(); const d = DAYS[todayIndex()]; renderDay(d, true); }, 15000);
+  setInterval(()=>{ updateClock(); detectNow(); }, 15000);
     // Generar leyenda dinámica: materia -> profesores
     function buildLegend(){
       const map = new Map();
@@ -463,7 +654,7 @@
 
     // Format toggle
     const fmtBtn = document.getElementById('btnToggleFormat');
-    if(fmtBtn){ fmtBtn.addEventListener('click', ()=>{ const f = toggleHourFormat(); fmtBtn.textContent = f==='12' ? '12/24' : '24/12'; renderWeek(); const d = DAYS[todayIndex()]; renderDay(d, true); }); }
+  if(fmtBtn){ fmtBtn.addEventListener('click', ()=>{ const f = toggleHourFormat(); fmtBtn.textContent = f==='12' ? '12/24' : '24/12'; renderWeek(); detectNow(); }); }
 
     // util: convertir 24h "HH:MM" a 12h "h:MM AM/PM"
     function to12(t){
@@ -474,7 +665,7 @@
     // Actualiza el header con día, fecha y hora locales
     function updateClock(){
       const now = new Date();
-      const dayName = DAYS[todayIndex()] || 'Lunes';
+      const dayName = localWeekdayName();
       const dateStr = now.toLocaleDateString(undefined, {weekday:'long', year:'numeric', month:'short', day:'numeric'});
       const timeStr = now.toLocaleTimeString(undefined, {hour:'numeric', minute:'2-digit'});
       const dayEl = document.getElementById('currentDay');

@@ -1,0 +1,4 @@
+[
+  { "name": "10°A - IDGS Sep-Dic 2025", "file": "data/horario-10A.json" },
+  { "name": "10B - ejemplo (incluye Sábado)", "file": "data/horario-10B.json" }
+]

@@ -1,0 +1,66 @@
+{
+  "name": "Horario ejemplo 10B - incluye Sábado",
+  "days": ["Lunes","Martes","Miércoles","Jueves","Viernes","Sábado"],
+  "hours": ["09:00","10:00","11:00","12:00","13:00","14:00","15:00","16:00","17:00","18:00","19:00","20:00"],
+  "events": [
+    { "d":"Sábado", "h":"09:00", "e":"10:00", "t":"Taller de Programación", "a":"Lab 1", "p":"Profe Ejemplo", "k":"apps" },
+    { "d":"Sábado", "h":"10:00", "e":"11:00", "t":"Revisión de proyectos", "a":"Lab 1", "p":"Profe Ejemplo", "k":"integ" },
+    { "d":"Sábado", "h":"11:00", "e":"12:00", "t":"Inglés práctico", "a":"Aula 4", "p":"Profe Inglés", "k":"ingles" },
+    { "d":"Sábado", "h":"13:00", "e":"14:00", "t":"Sesión de dudas (optativa)", "a":"Aula 3", "p":"Profe Optativa", "k":"optativa" },
+
+    { "d":"Lunes", "h":"09:00", "e":"10:00", "t":"Introducción a Bases de Datos", "a":"Aula 2", "p":"Dra. Rivera", "k":"apps" },
+    { "d":"Lunes", "h":"10:00", "e":"11:00", "t":"Matemáticas Aplicadas", "a":"Aula 5", "p":"Mtro. López", "k":"gestion" },
+    { "d":"Lunes", "h":"11:00", "e":"12:00", "t":"Taller de UX/UI", "a":"Lab 2", "p":"Profe Diseño", "k":"optativa" },
+    { "d":"Lunes", "h":"13:00", "e":"14:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+
+    { "d":"Martes", "h":"09:00", "e":"10:00", "t":"Inglés práctico", "a":"A1/D1", "p":"Sughey Adriana Moreno Arellano", "k":"ingles" },
+    { "d":"Martes", "h":"10:00", "e":"11:00", "t":"Programación avanzada", "a":"Lab 3", "p":"Profe Avanzado", "k":"apps" },
+    { "d":"Martes", "h":"11:00", "e":"12:00", "t":"Negociación empresarial", "a":"A4/D1", "p":"Alfredo Hugo Silva García", "k":"nego" },
+
+    { "d":"Miércoles", "h":"09:00", "e":"10:00", "t":"Gestión Proc. Des. Soft", "a":"CC11/D4", "p":"Ángel Yazveck Alcocer Durán", "k":"gestion" },
+    { "d":"Miércoles", "h":"10:00", "e":"11:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas Landa", "k":"optativa" },
+    { "d":"Miércoles", "h":"11:00", "e":"12:00", "t":"Laboratorio de Sistemas", "a":"Lab 1", "p":"Equipo Lab", "k":"integ" },
+
+    { "d":"Jueves", "h":"09:00", "e":"10:00", "t":"Seminario: Tendencias Web", "a":"A6/D1", "p":"Conferencista Invitado", "k":"apps" },
+    { "d":"Jueves", "h":"10:00", "e":"11:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+
+    { "d":"Viernes", "h":"09:00", "e":"10:00", "t":"Prácticas de laboratorio", "a":"Lab 2", "p":"Equipo Lab", "k":"integ" },
+    { "d":"Viernes", "h":"10:00", "e":"11:00", "t":"Evaluación parcial", "a":"Aula 1", "p":"Coordinación", "k":"apps" }
+  ,
+  { "d":"Lunes", "h":"16:00", "e":"17:00", "t":"Aplicaciones web progresivas", "a":"CC10/CECADEC", "p":"José Christian Narváez", "k":"apps" },
+  { "d":"Lunes", "h":"17:00", "e":"18:00", "t":"Gestión Proc. Des. Soft", "a":"CC11/D4", "p":"Ángel Yazveck", "k":"gestion" },
+  { "d":"Lunes", "h":"18:00", "e":"19:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas", "k":"optativa" },
+  { "d":"Lunes", "h":"19:00", "e":"20:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi", "k":"movil" },
+  { "d":"Lunes", "h":"20:00", "e":"21:00", "t":"Inglés práctico (tarde)", "a":"A1/D1", "p":"Sughey Moreno", "k":"ingles" },
+
+  { "d":"Martes", "h":"16:00", "e":"17:00", "t":"Programación avanzada (tarde)", "a":"Lab 3", "p":"Profe Avanzado", "k":"apps" },
+  { "d":"Martes", "h":"17:00", "e":"18:00", "t":"Negociación empresarial", "a":"A4/D1", "p":"Alfredo Silva", "k":"nego" },
+  { "d":"Martes", "h":"18:00", "e":"19:00", "t":"Desarrollo móvil integral", "a":"CA3/D4", "p":"Maximiliano Carsi", "k":"movil" },
+  { "d":"Martes", "h":"19:00", "e":"20:00", "t":"Laboratorio de Sistemas (tarde)", "a":"Lab 1", "p":"Equipo Lab", "k":"integ" },
+  { "d":"Martes", "h":"20:00", "e":"21:00", "t":"Taller de proyectos", "a":"Lab 2", "p":"Profe Taller", "k":"optativa" },
+
+  { "d":"Miércoles", "h":"16:00", "e":"17:00", "t":"Gestión Proc. Des. Soft (tarde)", "a":"CC11/D4", "p":"Ángel Yazveck", "k":"gestion" },
+  { "d":"Miércoles", "h":"17:00", "e":"18:00", "t":"Inglés IX (tarde)", "a":"A5/D1", "p":"Sughey Moreno", "k":"ingles" },
+  { "d":"Miércoles", "h":"18:00", "e":"19:00", "t":"Seminario: Tendencias Web", "a":"A6/D1", "p":"Conferencista", "k":"apps" },
+  { "d":"Miércoles", "h":"19:00", "e":"20:00", "t":"Optativa I: Creación de videojuegos (tarde)", "a":"CC11/D4", "p":"David Navas", "k":"optativa" },
+  { "d":"Miércoles", "h":"20:00", "e":"21:00", "t":"Sesión de dudas y consultoría", "a":"Aula 3", "p":"Equipo Docente", "k":"integ" },
+
+  { "d":"Jueves", "h":"16:00", "e":"17:00", "t":"Integradora (tarde)", "a":"A6/D1", "p":"Alfonso Bahena", "k":"integ" },
+  { "d":"Jueves", "h":"17:00", "e":"18:00", "t":"Integradora (bloque)", "a":"A6/D1", "p":"Alfonso Bahena", "k":"integ" },
+  { "d":"Jueves", "h":"18:00", "e":"19:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi", "k":"movil" },
+  { "d":"Jueves", "h":"19:00", "e":"20:00", "t":"Taller de Testing", "a":"Lab 3", "p":"Profe QA", "k":"apps" },
+  { "d":"Jueves", "h":"20:00", "e":"21:00", "t":"Club de Código (opcional)", "a":"Lab 1", "p":"Mentores", "k":"optativa" },
+
+  { "d":"Viernes", "h":"16:00", "e":"17:00", "t":"Prácticas de laboratorio (tarde)", "a":"Lab 2", "p":"Equipo Lab", "k":"integ" },
+  { "d":"Viernes", "h":"17:00", "e":"18:00", "t":"Evaluación parcial (tarde)", "a":"Aula 1", "p":"Coordinación", "k":"apps" },
+  { "d":"Viernes", "h":"18:00", "e":"19:00", "t":"Negociación empresarial (tarde)", "a":"A4/D1", "p":"Alfredo Silva", "k":"nego" },
+  { "d":"Viernes", "h":"19:00", "e":"20:00", "t":"Desarrollo móvil integral (tarde)", "a":"CC1/CEDIM", "p":"Maximiliano Carsi", "k":"movil" },
+  { "d":"Viernes", "h":"20:00", "e":"21:00", "t":"Cierre de proyectos y exposición", "a":"Aula 2", "p":"Equipo Docente", "k":"apps" },
+
+  { "d":"Sábado", "h":"16:00", "e":"17:00", "t":"Taller vespertino de Programación", "a":"Lab 1", "p":"Profe Ejemplo", "k":"apps" },
+  { "d":"Sábado", "h":"17:00", "e":"18:00", "t":"Revisión de proyectos (tarde)", "a":"Lab 1", "p":"Profe Ejemplo", "k":"integ" },
+  { "d":"Sábado", "h":"18:00", "e":"19:00", "t":"Inglés práctico (tarde)", "a":"Aula 4", "p":"Profe Inglés", "k":"ingles" },
+  { "d":"Sábado", "h":"19:00", "e":"20:00", "t":"Sesión de dudas (optativa)", "a":"Aula 3", "p":"Profe Optativa", "k":"optativa" },
+  { "d":"Sábado", "h":"20:00", "e":"21:00", "t":"Mesa redonda: Innovación", "a":"Aula 6", "p":"Invitados", "k":"apps" }
+  ]
+}

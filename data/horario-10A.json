@@ -1,0 +1,36 @@
+{
+  "name": "10°A - IDGS Sep-Dic 2025",
+  "days": ["Lunes","Martes","Miércoles","Jueves","Viernes"],
+  "hours": ["15:00","16:00","17:00","18:00","19:00","20:00"],
+  "events": [
+    { "d":"Lunes", "h":"16:00", "e":"17:00", "t":"Aplicaciones web progresivas", "a":"CC10/CECADEC", "p":"José Christian Narváez Figueroa", "k":"apps" },
+    { "d":"Lunes", "h":"17:00", "e":"18:00", "t":"Aplicaciones web progresivas", "a":"CC10/CECADEC", "p":"José Christian Narváez Figueroa", "k":"apps" },
+    { "d":"Lunes", "h":"18:00", "e":"19:00", "t":"Gestión Proc. Des. Soft", "a":"CC1/CEDIM", "p":"Ángel Yazveck Alcocer Durán", "k":"gestion" },
+    { "d":"Lunes", "h":"19:00", "e":"20:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas Landa", "k":"optativa" },
+    { "d":"Lunes", "h":"20:00", "e":"21:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+
+    { "d":"Martes", "h":"15:00", "e":"16:00", "t":"Inglés IX", "a":"A1/D1", "p":"Sughey Adriana Moreno Arellano", "k":"ingles" },
+    { "d":"Martes", "h":"16:00", "e":"17:00", "t":"Aplicaciones web progresivas", "a":"CC10/CECADEC", "p":"José Christian Narváez Figueroa", "k":"apps" },
+    { "d":"Martes", "h":"17:00", "e":"18:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas Landa", "k":"optativa" },
+    { "d":"Martes", "h":"18:00", "e":"19:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas Landa", "k":"optativa" },
+    { "d":"Martes", "h":"19:00", "e":"20:00", "t":"Desarrollo móvil integral", "a":"CA3/D4", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+    { "d":"Martes", "h":"20:00", "e":"21:00", "t":"Desarrollo móvil integral", "a":"CA3/D4", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+
+    { "d":"Miércoles", "h":"16:00", "e":"17:00", "t":"Gestión Proc. Des. Soft", "a":"CC11/D4", "p":"Ángel Yazveck Alcocer Durán", "k":"gestion" },
+    { "d":"Miércoles", "h":"17:00", "e":"18:00", "t":"Inglés IX", "a":"A5/D1", "p":"Sughey Adriana Moreno Arellano", "k":"ingles" },
+    { "d":"Miércoles", "h":"18:00", "e":"19:00", "t":"Inglés IX", "a":"A5/D1", "p":"Sughey Adriana Moreno Arellano", "k":"ingles" },
+    { "d":"Miércoles", "h":"19:00", "e":"20:00", "t":"Negociación empresarial", "a":"A4/D1", "p":"Alfredo Hugo Silva García", "k":"nego" },
+    { "d":"Miércoles", "h":"20:00", "e":"21:00", "t":"Optativa I: Creación de videojuegos", "a":"CC11/D4", "p":"David Navas Landa", "k":"optativa" },
+
+    { "d":"Jueves", "h":"17:00", "e":"18:00", "t":"Integradora", "a":"A6/D1", "p":"Alfonso Bahena Ramírez", "k":"integ" },
+    { "d":"Jueves", "h":"18:00", "e":"19:00", "t":"Integradora", "a":"A6/D1", "p":"Alfonso Bahena Ramírez", "k":"integ" },
+    { "d":"Jueves", "h":"19:00", "e":"20:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+    { "d":"Jueves", "h":"20:00", "e":"21:00", "t":"Desarrollo móvil integral", "a":"CC2/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+
+    { "d":"Viernes", "h":"15:00", "e":"16:00", "t":"Inglés IX", "a":"A9/D1", "p":"Sughey Adriana Moreno Arellano", "k":"ingles" },
+    { "d":"Viernes", "h":"16:00", "e":"17:00", "t":"Desarrollo móvil integral", "a":"CC1/CEDIM", "p":"Maximiliano Carsi Castrejón", "k":"movil" },
+    { "d":"Viernes", "h":"17:00", "e":"18:00", "t":"Negociación empresarial", "a":"Sala 4 Doc 4", "p":"Alfredo Hugo Silva García", "k":"nego" },
+    { "d":"Viernes", "h":"18:00", "e":"19:00", "t":"Gestión Proc. Des. Soft", "a":"CC10/CECADEC", "p":"Ángel Yazveck Alcocer Durán", "k":"gestion" },
+    { "d":"Viernes", "h":"19:00", "e":"20:00", "t":"Gestión Proc. Des. Soft", "a":"CC10/CECADEC", "p":"Ángel Yazveck Alcocer Durán", "k":"gestion" }
+  ]
+}
